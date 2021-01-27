@@ -14,7 +14,7 @@ import Home from "@material-ui/icons/Home";
 
 import { Node } from "types/CustomTypes";
 import GraphDisplay from "../graphDisplay/GraphDisplay";
-import EngagementViewContent from "./dynamicEngagementViewFeatures/DynamicEngagementViewFeatures";
+import LensAndNodeTableContainer from "./sidebar/LensAndNodeTableContainer";
 import { LoginNotification } from "../reusableComponents";
 import { checkLogin } from "../../services/login/checkLoginService";
 import { useStyles } from "../graphDisplay/GraphDisplayStyles";
@@ -98,7 +98,7 @@ export default function EngagementView({
 
         <Divider />
 
-        <EngagementViewContent setLens={setLens} curNode={curNode} />
+        <LensAndNodeTableContainer setLens={setLens} curNode={curNode} />
       </Drawer>
 
       <main

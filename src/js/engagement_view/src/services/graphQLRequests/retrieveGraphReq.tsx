@@ -1,6 +1,6 @@
 import {BaseNode, LensScopeResponse} from '../../types/CustomTypes';
-import {unpackPluginNodes} from './utils_GraphQlEndpointRetrieveGraph/unpackPluginNodes';
-import {expandScopeQuery} from './utils_GraphQlEndpointRetrieveGraph/expandScopeQuery';
+import {unpackPluginNodes} from './utils_retrieveGraph/unpackPluginNodes';
+import {expandScopeQuery} from './utils_retrieveGraph/expandScopeQuery';
 
 import DEV_API_EDGES from '../constants';
 import {apiFetchWithBody} from '../fetch';

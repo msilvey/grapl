@@ -1,10 +1,10 @@
 import React from "react";
 
 import NodeTable from '../nodeTable/NodeTable';
-import { NodeDetailsProps, EngagementViewContentProps } from "types/DynamicEngagementViewTypes";
+import { NodeDetailsProps, EngagementViewProps } from "types/LensAndNodeTableTypes";
 
 import {ToggleLensTable} from "./utils/toggleLensTable";
-import {ToggleNodeTable} from './utils/toggleNodeTable';
+import {ToggleNodeDetailTable} from './utils/toggleNodeDetailTable';
 
 export const NodeDetails = ({node}: NodeDetailsProps) => {
     return ( 
@@ -12,11 +12,11 @@ export const NodeDetails = ({node}: NodeDetailsProps) => {
     )
 }
 
-export default function EngagementViewContent({setLens, curNode}: EngagementViewContentProps) {
+export default function LensAndNodeTableContainer({setLens, curNode}: EngagementViewProps) {
     return (
         <>
             <ToggleLensTable setLens={setLens}/>
-            <ToggleNodeTable curNode={curNode}/>
+            <ToggleNodeDetailTable curNode={curNode}/>
         </>
     );
 }

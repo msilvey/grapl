@@ -12,15 +12,15 @@ export function tableHeader(node: Node, styles: any) {
         <TableHead >
             <TableRow>
                 <TableCell 
-                    align="left" 
+                    align="right" 
                     className={styles.tableHeader}>
-                    <b> PROPERTY </b>
+                    <b> Property </b>
                 </TableCell>
                 <TableCell 
-                    align="left"
+                    align="right"
                     className={styles.tableHeader}
                 >
-                    <b> VALUE </b>
+                    <b> Value </b>
                 </TableCell>
             </TableRow>
         </TableHead>

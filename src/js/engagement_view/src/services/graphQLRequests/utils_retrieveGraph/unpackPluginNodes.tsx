@@ -36,6 +36,5 @@ export const unpackPluginNodes = (nodes: BaseNode[]) => {
                 }
             }
         })
-
     }
 }

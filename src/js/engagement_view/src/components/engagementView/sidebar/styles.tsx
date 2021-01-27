@@ -10,13 +10,10 @@ export const useStyles = makeStyles({
         backgroundColor:"#424242",
     },
     title: {
-        fontSize: "25px",
-        color: "#ffffff",
-    },
-    icon:{
+        margin: "1rem",
+        fontSize: "1.1rem",
         color: "#42C6FF",
-        margin: "15px 0 0 10px",
-    }, 
+    },
     expand:{
         color: "#42C6FF",
         margin: "0px"
@@ -28,10 +25,14 @@ export const useStyles = makeStyles({
         minWidth: 450, 
     },
     lensName: {
-        fontSize: "16px",
+        fontSize: ".75rem",
     },
     pagination: {
         margin: ".5rem",
         backgroundColor: "#595959",
+    },
+    head: {
+        color: "white",
+        fontSize: ".75rem",
     }
 });

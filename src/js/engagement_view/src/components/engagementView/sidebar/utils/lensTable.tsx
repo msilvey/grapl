@@ -10,7 +10,7 @@ import { SelectLens } from './selectLens';
 import { Lens } from "types/CustomTypes";
 import { PaginationState } from "types/CustomTypes";
 
-export const pagedTable = (
+export const lensTable = (
     state: PaginationState, 
     page: number, 
     rowsPerPage: number, 

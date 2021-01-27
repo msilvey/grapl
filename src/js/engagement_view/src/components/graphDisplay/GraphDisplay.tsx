@@ -1,16 +1,16 @@
 // @ts-nocheck
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ForceGraph2D } from 'react-force-graph';
 import * as d3 from "d3";
 
-import { retrieveGraph } from "../../services/graphQL/graphQlEndpointRetrieveGraphReq";
+import { retrieveGraph } from "../../services/graphQLRequests/retrieveGraphReq";
 
 import { BKDRHash, riskColor, calcNodeRgb , calcLinkColor} from "./utils/graphColoring/coloring.tsx";
 import { mapLabel } from './utils/graph/labels.tsx';
 import { nodeRisk } from './utils/calculations/node/nodeCalcs.tsx'
 import { calcLinkDirectionalArrowRelPos, calcLinkParticleWidth  } from './utils/calculations/link/linkCalcs.tsx'
-import {mergeGraphs} from './utils/graph/mergeGraphs.tsx'
-import {graphQLAdjacencyMatrix} from './utils/graphQL/graphQLAdjacencyMatrix.tsx'
+import { mergeGraphs } from './utils/graph/mergeGraphs.tsx'
+import { graphQLAdjacencyMatrix } from './utils/graphQL/graphQLAdjacencyMatrix.tsx'
 import { Node, LinkType, GraphType, ColorHashOptions } from "../../types/CustomTypes.tsx"
 
 type ColorHashOptions = {
@@ -179,6 +179,7 @@ const updateGraph = async (
     }
 
     const curLensName = state.curLensName;
+
     await retrieveGraph(lensName)
         .then(async (scope) => {
             const update = graphQLAdjacencyMatrix(scope);
@@ -206,17 +207,12 @@ const updateGraph = async (
         .catch((e) => console.error("Failed to retrieveGraph ", e))
 }
 
-
-const defaultGraphDisplayState = (lensName: string): GraphDisplayState => {
-    return {
-        graphData: {nodes: [], links: []},
+const GraphDisplay = ({lensName, setCurNode}: GraphDisplayProps) => {
+    const [state, setState]: GraphDisplayState = useState({
+        graphData: {nodes: [], links: []}, 
         curLensName: lensName,
         intervalMap: {},
-    }
-}
-
-const GraphDisplay = ({lensName, setCurNode}: GraphDisplayProps) => {
-    const [state, setState] = React.useState(defaultGraphDisplayState(lensName));
+    });
     const forceRef = useRef(null);
 
     useEffect(() => {
@@ -367,7 +363,6 @@ const GraphDisplay = ({lensName, setCurNode}: GraphDisplayProps) => {
                     const fontSize = 15 / globalScale;
 
                     ctx.font = `${fontSize}px Arial`;
-
 
                     const textWidth = ctx.measureText(label).width;
 

@@ -16,7 +16,7 @@ export type ToggleNodeTableProps = {
     curNode: Node | null
 }
 
-export type EngagementViewContentProps = {
+export type EngagementViewProps = {
     setLens: (lens: string) => void, 
     curNode: Node | null
 }

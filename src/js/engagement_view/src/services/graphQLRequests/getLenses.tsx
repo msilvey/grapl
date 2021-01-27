@@ -29,6 +29,7 @@ export const getLenses = async (first: number, offset: number) => {
             .then((res) => res.data);
 
     const lensQueryData = await response;
+    
     console.log("Retrieved lenses: ", lensQueryData);
     
     return lensQueryData;

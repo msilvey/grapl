@@ -2,17 +2,12 @@ import React, {useEffect, useState} from "react";
 
 import Button from "@material-ui/core/Button";
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import BubbleChartIcon from '@material-ui/icons/BubbleChart';
 import Divider from "@material-ui/core/Divider";
 
-import { pagedTable } from "./lensPagedTable";
-import { getLenses}  from "services/graphQL/graphQlEndpointGetLensesReq";
+import { lensTable } from "./lensTable";
+import { getLenses}  from "services/graphQLRequests/getLenses";
 
-
-import {
-    ToggleLensTableProps, 
-    ToggleLensTableState, 
-} from "types/CustomTypes";
+import { ToggleLensTableProps, ToggleLensTableState, } from "types/CustomTypes";
 
 import { useStyles } from '../styles';
 
@@ -24,7 +19,6 @@ const defaultToggleLensTableState = (): ToggleLensTableState => {
         offset: 0, // by default, start from page 0
     }
 }
-
 
 export function ToggleLensTable( {setLens}: ToggleLensTableProps ) {
     const [state, setState] = useState(defaultToggleLensTableState());
@@ -65,10 +59,7 @@ export function ToggleLensTable( {setLens}: ToggleLensTableProps ) {
     return (
         <>
             <div className={classes.header}>
-                <b className={classes.title}>
-                    <BubbleChartIcon className = {classes.icon} />
-                    LENSES 
-                </b>
+                <b className={classes.title}> Lenses </b>
                 <Button
                     className = {classes.button}
                     onClick={() => { 
@@ -84,7 +75,7 @@ export function ToggleLensTable( {setLens}: ToggleLensTableProps ) {
             <div className="lensToggle">
                 {   
                     state.toggled && 
-                    pagedTable(state, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, setLens, classes)
+                    lensTable(state, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, setLens, classes)
                 }
             </div>
 
