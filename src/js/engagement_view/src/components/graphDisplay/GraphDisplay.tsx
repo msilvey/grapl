@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect,useState, useMemo, useCallback } from 'react';
 import { ForceGraph2D } from 'react-force-graph';
 import { retrieveGraph } from "../../services/graphQLRequests/retrieveGraphReq";
 
@@ -17,12 +17,13 @@ type GraphDisplayProps = {
 }
 
 type GraphDisplayState = {
-    graphData: AdjacencyMatrix,
+    graphData: any,
     curLensName: string | null,
+    lensSelected: boolean 
 }
 
 type GraphState = {
-    curLensName: LensType[], 
+    curLensName: string, 
     graphData: GraphType[]
 }
 
@@ -42,14 +43,13 @@ export const mapNodeProps = (node: Node, f: (string) => void) => {
     }
 };
 
-
 const updateGraph = async (lensName: string, state: GraphState, setState: (state: GraphState) => void ) => {
+    const curLensName = state.curLensName;
+
     if (!lensName) {
-        console.log('Attempted to fetch empty lensName')
+        console.log('No Available Lenses')
         return;
     }
-
-    const curLensName = state.curLensName;
 
     await retrieveGraph(lensName)
         .then(async (scope) => {
@@ -67,7 +67,7 @@ const updateGraph = async (lensName: string, state: GraphState, setState: (state
                         graphData: mergeUpdate,
                     })
                 } else {
-                    console.log("Switched lens, updating graph", state.curLensName, 'ln', lensName);
+                    console.log("New Lens Selected, updating graph", state.curLensName, 'ln', lensName);
                     setState({
                         ...state,
                         curLensName: lensName,
@@ -79,153 +79,114 @@ const updateGraph = async (lensName: string, state: GraphState, setState: (state
         .catch((e) => console.error("Failed to retrieveGraph ", e))
 }
 
+    const NODE_R = 8;
+    const HighlightGraph = () => {
+        const data = useMemo(() => {
+            const gData = {
+                nodes: [
+                    {id: "Process1"}, 
+                    {id: "Process2"}, 
+                    {id: "Evil.exe"}, 
+                    {id: "DesktopFVJR"},
+                    {id: "DesktopGAGA"},
+                    {id: "main.txt"},
+                    {id: "Chrome"},
+                ],
+                links: [
+                    {source: "Process1", target: "Process2"},
+                    {source: "Process1", target: "Evil.exe"},
+                    {source: "DesktopFVJR", target: "Evil.exe"},
+                    {source: "Process2", target: "DesktopFVJR"},
+                    {source: "DesktopGAGA", target: "Process1"},
+                    {source: "Chrome", target: "Process1"},
+                    {source: "main.txt", target: "Chrome"}
+                ],
+            };
 
+            // cross-link node objects
+            gData.index = {};
+            gData.nodes.forEach((node) => (gData.index[node.id] = node));
 
-const GraphDisplay = ({lensName, setCurNode}: GraphDisplayProps) => {
-    const [state, setState]: GraphDisplayState = useState({
-        graphData: {nodes: [], links: []}, 
-        curLensName: lensName
-    });
+            gData.links.forEach((link) => {
+                const a = gData.index[link.source];
+                const b = gData.index[link.target];
 
-    useEffect(() => {
-        const interval = setInterval(async () => {
-            if (lensName) {
-                console.debug('updating graph');
-                await updateGraph(lensName, state, setState);
-            }
-        }, 1000);
+                !a.neighbors && (a.neighbors = []);
+                !b.neighbors && (b.neighbors = []);
 
-        console.debug('setting lensName', lensName);
-        
-        return () => {
-            clearInterval(interval);
+                a.neighbors.push(b);
+                b.neighbors.push(a);
+
+                !a.links && (a.links = []);
+                !b.links && (b.links = []);
+
+                a.links.push(link);
+                b.links.push(link);
+            });
+
+            return gData;
+        }, []);
+
+        const [highlightNodes, setHighlightNodes] = useState(new Set());
+        const [highlightLinks, setHighlightLinks] = useState(new Set());
+        const [hoverNode, setHoverNode] = useState(null);
+
+        const updateHighlight = () => {
+            setHighlightNodes(highlightNodes);
+            setHighlightLinks(highlightLinks);
         };
-    }, [lensName, state, setState]);
 
-    const graphData = state.graphData;
+        const handleNodeHover = node => {
+            highlightNodes.clear();
+            highlightLinks.clear();
+            if (node) {
+                highlightNodes.add(node);
+                node.neighbors.forEach(neighbor => highlightNodes.add(neighbor));
+                node.links.forEach(link => highlightLinks.add(link));
+            }
 
-    // #TODO: ADD ZOOM HANDLERS FOR MAX ZOOM IN/OUT
+            setHoverNode(node || null);
+            updateHighlight();
+        };
 
-    return (
-        <>
-            <ForceGraph2D
-                graphData={graphData}
-                nodeLabel={(node: Node) => node.nodeLabel}
-                enableNodeDrag={true}
-                linkDirectionalParticles={1}
-                linkDirectionalParticleWidth={(link) => {
-                    return calcLinkParticleWidth(link, graphData);
-                }}
-                linkDirectionalParticleColor={(link) => {
-                    return calcLinkColor(link, graphData)
-                }}
-                linkDirectionalParticleSpeed={0.005}
-                onNodeClick={
-                    (node: Node, event: string) => {
-                        setCurNode(node);
-                    }
-                }
-                linkDirectionalArrowLength={8}
-                linkWidth={4}
-                linkDirectionalArrowRelPos={(link => {
-                    return calcLinkDirectionalArrowRelPos(link, graphData);
-                })}
-                linkCanvasObjectMode={(() => 'after')}
-                linkCanvasObject={((link: LinkType, ctx: any) => {
-                    const MAX_FONT_SIZE = 8;
-                    const LABEL_NODE_MARGIN = 12;
-                    const start = link.source;
-                    const end = link.target;
-                    // ignore unbound links
-                    link.color = calcLinkColor(link, graphData);
+        const handleLinkHover = link => {
+            highlightNodes.clear();
+            highlightLinks.clear();
 
-                    if (typeof start !== 'object' || typeof end !== 'object') return;
-                    // calculate label positioning
-                    const textPos = Object.assign(
-                        ...['x', 'y'].map((c: any) => (
-                            {
-                                [c]: start[c] + (end[c] - start[c]) / 2 // calc middle point
-                            }
-                        )) as any
-                    );
+            if (link) {
+                highlightLinks.add(link);
+                highlightNodes.add(link.source);
+                highlightNodes.add(link.target);
+            }
 
-                    const relLink = {x: end.x - start.x, y: end.y - start.y};
+            updateHighlight();
+        };
 
-                    const maxTextLength = Math.sqrt(Math.pow(relLink.x, 2) + Math.pow(relLink.y, 2)) - LABEL_NODE_MARGIN * 8;
+        const paintRing = useCallback((node, ctx) => {
+            // add ring just for highlighted nodes
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, NODE_R * 1.4, 0, 2 * Math.PI, false);
+            ctx.fillStyle = node === hoverNode ? 'red' : 'orange';
+            ctx.fill();
+        }, [hoverNode]);
 
-                    let textAngle = Math.atan2(relLink.y, relLink.x);
-                    // maintain label vertical orientation for legibility
-                    if (textAngle > Math.PI / 2) textAngle = -(Math.PI - textAngle);
-                    if (textAngle < -Math.PI / 2) textAngle = -(-Math.PI - textAngle);
+        return <ForceGraph2D
+            graphData={data}
+            nodeRelSize={NODE_R}
+            onNodeDragEnd={(node => {
+                node.fx = node.x;
+                node.fy = node.y;
+            })}  
+            linkWidth={link => highlightLinks.has(link) ? 5 : 1}
+            linkDirectionalArrowLength={3.5}
+            linkDirectionalArrowRelPos={1}
+            linkDirectionalParticles={4}
+            linkDirectionalParticleWidth={link => highlightLinks.has(link) ? 4 : 0}
+            nodeCanvasObjectMode={node => highlightNodes.has(node) ? 'before' : undefined}
+            nodeCanvasObject={paintRing}
+            onNodeHover={handleNodeHover}
+            onLinkHover={handleLinkHover}
+        />;
+    };
 
-                    const label = mapLabel(link.label);
-                    // estimate fontSize to fit in link length
-                    ctx.font = '50px Arial';
-                    const fontSize = Math.min(MAX_FONT_SIZE, maxTextLength / ctx.measureText(label).width);
-                    ctx.font = `${fontSize + 5}px Arial`;
-
-                    let textWidth = ctx.measureText(label).width;
-
-                    textWidth += Math.round(textWidth * 0.25);
-
-                    const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); // some padding
-                    // draw text label (with background rect)
-                    ctx.save();
-                    ctx.translate(textPos.x, textPos.y);
-                    ctx.rotate(textAngle);
-                    ctx.fillStyle = 'rgb(115,222,255,1)';
-                    ctx.fillRect(-bckgDimensions[0] / 2, -bckgDimensions[1] / 2, ...bckgDimensions);
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillStyle = 'white';
-                    //content, left/right, top/bottom
-                    ctx.fillText(label, .75, 3);
-                    ctx.restore();
-                })}
-                nodeCanvasObject={((node: Node, ctx: any, globalScale: any) => {
-                    // add ring just for highlighted nodes
-
-                    const NODE_R = nodeRisk(node, graphData);
-                    ctx.save();
-
-                    // Risk outline color
-                    ctx.beginPath();
-                    ctx.arc(node.x, node.y, NODE_R * 1.3, 0, 2 * Math.PI, false);
-                    ctx.fillStyle = "blue";
-                    ctx.fill();
-                    ctx.restore();
-
-                    ctx.save();
-
-                    // Node color
-                    ctx.beginPath();
-                    ctx.arc(node.x, node.y, NODE_R * 1.2, 0, 2 * Math.PI, false);
-
-                    ctx.fillStyle = "cyan";
-                    ctx.fill();
-                    ctx.restore();
-
-                    const label = node.nodeLabel;
-
-                    const fontSize = 15 / globalScale;
-
-                    ctx.font = `${fontSize}px Arial`;
-
-                    const textWidth = ctx.measureText(label).width;
-
-                    const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); // some padding
-                    // node label color
-                    ctx.fillStyle = 'rgba(48, 48, 48, 0.8)';
-                    ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions);
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillStyle = 'white';
-                    ctx.fillText(label, node.x, node.y);
-
-                })}
-            />
-        </>
-    )
-}
-
-export default GraphDisplay;
+export default HighlightGraph;//GraphDispaly

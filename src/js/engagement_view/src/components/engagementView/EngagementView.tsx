@@ -14,6 +14,7 @@ import Home from "@material-ui/icons/Home";
 
 import { Node } from "types/CustomTypes";
 import GraphDisplay from "../graphDisplay/GraphDisplay";
+import HighlightGraph from "../graphDisplay/GraphDisplay";
 import LensAndNodeTableContainer from "./sidebar/LensAndNodeTableContainer";
 import { LoginNotification } from "../reusableComponents";
 import { checkLogin } from "../../services/login/checkLoginService";
@@ -166,11 +167,12 @@ export const EngagementUx = () => {
         curNode={state.curNode}
       />
       <>
+        
         <div className={classes.loggedIn}>
           {!loggedIn ? <LoginNotification /> : ""}
         </div>
 
-        <GraphDisplay
+        {/* <GraphDisplay
           lensName={state.curLens}
           setCurNode={(node: Node) => {
             setState({
@@ -178,7 +180,10 @@ export const EngagementUx = () => {
               curNode: node,
             });
           }}
-        />
+        /> */}
+
+        <HighlightGraph />
+
       </>
     </>
   );
