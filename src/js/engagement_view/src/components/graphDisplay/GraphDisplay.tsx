@@ -1,24 +1,15 @@
 // @ts-nocheck
 import React, { useEffect, useRef, useState } from 'react';
 import { ForceGraph2D } from 'react-force-graph';
-import * as d3 from "d3";
-
 import { retrieveGraph } from "../../services/graphQLRequests/retrieveGraphReq";
 
-import { BKDRHash, riskColor, calcNodeRgb , calcLinkColor} from "./utils/graphColoring/coloring.tsx";
+import { calcLinkColor} from "./utils/graphColoring/coloring.tsx";
 import { mapLabel } from './utils/graph/labels.tsx';
 import { nodeRisk } from './utils/calculations/node/nodeCalcs.tsx'
 import { calcLinkDirectionalArrowRelPos, calcLinkParticleWidth  } from './utils/calculations/link/linkCalcs.tsx'
 import { mergeGraphs } from './utils/graph/mergeGraphs.tsx'
 import { graphQLAdjacencyMatrix } from './utils/graphQL/graphQLAdjacencyMatrix.tsx'
-import { Node, LinkType, GraphType, ColorHashOptions } from "../../types/CustomTypes.tsx"
-
-type ColorHashOptions = {
-    lightness: number,
-    saturation: number,
-    hue: number,
-    hash: BKDRHash,
-}
+import { Node, LinkType, GraphType } from "../../types/CustomTypes.tsx"
 
 type GraphDisplayProps = {
     lensName: string | null,
@@ -28,129 +19,12 @@ type GraphDisplayProps = {
 type GraphDisplayState = {
     graphData: AdjacencyMatrix,
     curLensName: string | null,
-    intervalMap: any,
 }
 
 type GraphState = {
     curLensName: LensType[], 
     graphData: GraphType[]
 }
-
-/**
- * Convert HSL to RGB
- *
- * @see {@link http://zh.wikipedia.org/wiki/HSL和HSV色彩空间} for further information.
- * @param {Number} H Hue ∈ [0, 360)
- * @param {Number} S Saturation ∈ [0, 1]
- * @param {Number} L Lightness ∈ [0, 1]
- * @returns {Array} R, G, B ∈ [0, 255]
- */
-
-const HSL2RGB = (H: number, S: number, L: number) => {
-    H /= 360;
-
-    const q = L < 0.5 ? L * (1 + S) : L + S - L * S;
-    const p = 2 * L - q;
-
-    return [H + 1 / 3, H, H - 1 / 3].map((color) => {
-        if (color < 0) {
-            color++;
-        }
-        if (color > 1) {
-            color--;
-        }
-        if (color < 1 / 6) {
-            color = p + (q - p) * 6 * color;
-        } else if (color < 0.5) {
-            color = q;
-        } else if (color < 2 / 3) {
-            color = p + (q - p) * 6 * (2 / 3 - color);
-        } else {
-            color = p;
-        }
-        return Math.round(color * 255);
-    });
-};
-
-const isArray = (o: Object) => {
-    return Object.prototype.toString.call(o) === '[object Array]';
-};
-
-/**
- * Color Hash Class
- *
- * @class
- */
-
-export class ColorHash {
-    constructor(options: ColorHashOptions | undefined) {
-        options = options || {};
-
-        const LS = [options.lightness, options.saturation].map((param) => {
-            param = param || [0.35, 0.5, 0.65]; // note that 3 is a prime
-            return isArray(param) ? param.concat() : [param];
-        });
-    
-        this.L = LS[0];
-        this.S = LS[1];
-    
-        if (typeof options.hue === 'number') {
-            options.hue = {min: options.hue, max: options.hue};
-        }
-        if (typeof options.hue === 'object' && !isArray(options.hue)) {
-            options.hue = [options.hue];
-        }
-        if (typeof options.hue === 'undefined') {
-            options.hue = [];
-        }
-        this.hueRanges = options.hue.map(function (range: number) {
-            return {
-                min: typeof range.min === 'undefined' ? 0 : range.min,
-                max: typeof range.max === 'undefined' ? 360 : range.max
-            };
-        });
-    
-        this.hash = options.hash || BKDRHash;
-    } 
-    /**
-     * Returns the hash in [h, s, l].
-     * Note that H ∈ [0, 360); S ∈ [0, 1]; L ∈ [0, 1];
-     *
-     * @param {String} str string to hash
-     * @returns {Array} [h, s, l]
-     */
-    hsl = (str: string) => {
-        let H, S, L;
-        let hash = this.hash(str);
-    
-        if (this.hueRanges.length) {
-            const range = this.hueRanges[hash % this.hueRanges.length];
-            const hueResolution = 727; // note that 727 is a prime
-            H = ((hash / this.hueRanges.length) % hueResolution) * (range.max - range.min) / hueResolution + range.min;
-        } else {
-            H = hash % 359; // note that 359 is a prime
-        }
-        hash = parseInt(hash / 360 as any);
-        S = this.S[hash % this.S.length];
-        hash = parseInt(hash / this.S.length as any);
-        L = this.L[hash % this.L.length];
-    
-        return [H, S, L];
-    }
-
-    /**
-     * Returns the hash in [r, g, b].
-     * Note that R, G, B ∈ [0, 255]
-     *
-     * @param {String} str string to hash
-     * @returns {Array} [r, g, b]
-     */
-    rgb = (str: string) => {
-        const hsl = this.hsl(str);
-        return HSL2RGB.apply(this, hsl);
-    };
-}
-
 
 export const mapNodeProps = (node: Node, f: (string) => void) => {
     for (const prop in node) {
@@ -168,11 +42,8 @@ export const mapNodeProps = (node: Node, f: (string) => void) => {
     }
 };
 
-const updateGraph = async (
-    lensName: string, 
-    state: GraphState, 
-    setState: (state: GraphState) => void,
-) => {
+
+const updateGraph = async (lensName: string, state: GraphState, setState: (state: GraphState) => void ) => {
     if (!lensName) {
         console.log('Attempted to fetch empty lensName')
         return;
@@ -187,6 +58,7 @@ const updateGraph = async (
             console.debug('update', update);
 
             const mergeUpdate = mergeGraphs(state.graphData, update);
+            
             if (mergeUpdate !== null) {
                 if (curLensName === lensName) {
                     setState({
@@ -207,36 +79,13 @@ const updateGraph = async (
         .catch((e) => console.error("Failed to retrieveGraph ", e))
 }
 
+
+
 const GraphDisplay = ({lensName, setCurNode}: GraphDisplayProps) => {
     const [state, setState]: GraphDisplayState = useState({
         graphData: {nodes: [], links: []}, 
-        curLensName: lensName,
-        intervalMap: {},
+        curLensName: lensName
     });
-    const forceRef = useRef(null);
-
-    useEffect(() => {
-        // console.log("useEffect - setting forceRef state");
-        forceRef.current.d3Force("link", d3.forceLink());
-        forceRef.current.d3Force('collide', d3.forceCollide(22));   
-        forceRef.current.d3Force("charge", d3.forceManyBody());
-        forceRef.current.d3Force('box', () => {
-            const N = 100;
-            // console.log(Graph.width(), Graph.height())
-            const SQUARE_HALF_SIDE = 20 * N * 0.5;
-            state.graphData.nodes.forEach(node => {
-                const x = node.x || 0, y = node.y || 0;
-                // bounce on box walls
-                if (Math.abs(x) > SQUARE_HALF_SIDE) {
-                    node.vx *= -1;
-                }
-                if (Math.abs(y) > SQUARE_HALF_SIDE) {
-                    node.vy *= -1;
-                }
-            });
-        });
-    }, [state])
-
 
     useEffect(() => {
         const interval = setInterval(async () => {
@@ -245,15 +94,15 @@ const GraphDisplay = ({lensName, setCurNode}: GraphDisplayProps) => {
                 await updateGraph(lensName, state, setState);
             }
         }, 1000);
+
         console.debug('setting lensName', lensName);
+        
         return () => {
             clearInterval(interval);
         };
     }, [lensName, state, setState]);
 
     const graphData = state.graphData;
-
-    const colorHash = new ColorHash({});
 
     // #TODO: ADD ZOOM HANDLERS FOR MAX ZOOM IN/OUT
 
@@ -284,7 +133,7 @@ const GraphDisplay = ({lensName, setCurNode}: GraphDisplayProps) => {
                 linkCanvasObjectMode={(() => 'after')}
                 linkCanvasObject={((link: LinkType, ctx: any) => {
                     const MAX_FONT_SIZE = 8;
-                    const LABEL_NODE_MARGIN = 8 * 1.5;
+                    const LABEL_NODE_MARGIN = 12;
                     const start = link.source;
                     const end = link.target;
                     // ignore unbound links
@@ -342,7 +191,7 @@ const GraphDisplay = ({lensName, setCurNode}: GraphDisplayProps) => {
                     // Risk outline color
                     ctx.beginPath();
                     ctx.arc(node.x, node.y, NODE_R * 1.3, 0, 2 * Math.PI, false);
-                    ctx.fillStyle = riskColor(node, graphData, colorHash);
+                    ctx.fillStyle = "blue";
                     ctx.fill();
                     ctx.restore();
 
@@ -352,9 +201,7 @@ const GraphDisplay = ({lensName, setCurNode}: GraphDisplayProps) => {
                     ctx.beginPath();
                     ctx.arc(node.x, node.y, NODE_R * 1.2, 0, 2 * Math.PI, false);
 
-                    const nodeRbg = calcNodeRgb(node, colorHash);
-
-                    ctx.fillStyle = `rgba(${nodeRbg[0]}, ${nodeRbg[1]}, ${nodeRbg[2]}, 1)`;
+                    ctx.fillStyle = "cyan";
                     ctx.fill();
                     ctx.restore();
 
@@ -376,7 +223,6 @@ const GraphDisplay = ({lensName, setCurNode}: GraphDisplayProps) => {
                     ctx.fillText(label, node.x, node.y);
 
                 })}
-                ref={forceRef}
             />
         </>
     )

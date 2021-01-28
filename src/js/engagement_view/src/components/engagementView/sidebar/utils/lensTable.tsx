@@ -3,7 +3,10 @@ import React from "react";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableContainer from "@material-ui/core/TableContainer";
+import TableCell from "@material-ui/core/TableCell";
 import TablePagination from '@material-ui/core/TablePagination';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from "@material-ui/core/TableRow";
 
 import { ClassNameMap } from '@material-ui/styles/withStyles';
 import { SelectLens } from './selectLens';
@@ -39,6 +42,16 @@ export const lensTable = (
                     (lens: Lens) => {
                         return(
                             <Table className={classes.table} aria-label="lens table" key={Number(lens.uid)}>
+                                <TableHead className = {classes.head}>
+                                    <TableRow>
+                                        <TableCell align="left">
+                                            <b> Lens Name </b>
+                                        </TableCell>
+                                        <TableCell align="right">
+                                            <b> Risk </b>
+                                        </TableCell>
+                                    </TableRow>
+                                </TableHead>
                                 <TableBody>
                                     <SelectLens 
                                         key={Number(lens.uid)}
