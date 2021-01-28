@@ -173,6 +173,10 @@ const updateGraph = async (lensName: string, state: GraphState, setState: (state
         return <ForceGraph2D
             graphData={data}
             nodeRelSize={NODE_R}
+            onNodeClick={(node => {
+                node.fx = null; 
+                node.fy = null;
+            })}
             onNodeDragEnd={(node => {
                 node.fx = node.x;
                 node.fy = node.y;
