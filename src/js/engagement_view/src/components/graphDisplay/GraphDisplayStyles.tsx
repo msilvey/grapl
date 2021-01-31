@@ -19,16 +19,16 @@ export const useStyles = makeStyles((theme: Theme) =>
         },
         appBar: {
             transition: theme.transitions.create(["margin", "width"], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen
             })
         },
         appBarShift: {
             width: `calc(100% - ${drawerWidth}px)`,
             marginLeft: drawerWidth,
             transition: theme.transitions.create(["margin", "width"], {
-            easing: theme.transitions.easing.easeOut,
-            duration: theme.transitions.duration.enteringScreen
+                easing: theme.transitions.easing.easeOut,
+                duration: theme.transitions.duration.enteringScreen
             })
         },
         menuButton: {
@@ -57,15 +57,15 @@ export const useStyles = makeStyles((theme: Theme) =>
             flexGrow: 1,
             padding: theme.spacing(3),
             transition: theme.transitions.create("margin", {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen
             }),
             marginLeft: -drawerWidth
         },
         contentShift: {
             transition: theme.transitions.create("margin", {
-            easing: theme.transitions.easing.easeOut,
-            duration: theme.transitions.duration.enteringScreen
+                easing: theme.transitions.easing.easeOut,
+                duration: theme.transitions.duration.enteringScreen
             }),
             marginLeft: 0,
         },
@@ -73,10 +73,10 @@ export const useStyles = makeStyles((theme: Theme) =>
             color:"#EAFDFF",
             fontSize: "1.5rem", 
         },
-        header:{
+        headerTitle:{
             fontSize: "35px",
         }, 
-        headerContent: {
+        headerContainer: {
             width: "100vw",
             display: "flex",  
             justifyContent: "space-between",

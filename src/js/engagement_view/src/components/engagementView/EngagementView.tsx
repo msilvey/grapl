@@ -14,7 +14,6 @@ import Home from "@material-ui/icons/Home";
 
 import { Node } from "types/CustomTypes";
 import GraphDisplay from "../graphDisplay/GraphDisplay";
-import HighlightGraph from "../graphDisplay/GraphDisplay";
 import LensAndNodeTableContainer from "./sidebar/LensAndNodeTableContainer";
 import { LoginNotification } from "../reusableComponents";
 import { checkLogin } from "../../services/login/checkLoginService";
@@ -71,9 +70,9 @@ export default function EngagementView({
             &#9776;
           </IconButton>
 
-          <div className={classes.headerContent}>
+          <div className={classes.headerContainer}>
             <Typography variant="h5" noWrap>
-              <b className={classes.header}> GRAPL </b>
+              <b className={classes.headerTitle}> GRAPL </b>
             </Typography>
             <Link to="/" className={classes.link}>
               <Home />
@@ -182,7 +181,7 @@ export const EngagementUx = () => {
           }}
         /> */}
 
-        <HighlightGraph />
+        <GraphDisplay />
 
       </>
     </>

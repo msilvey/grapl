@@ -38,7 +38,7 @@ export function ToggleLensTable( {setLens}: ToggleLensTableProps ) {
     useEffect( () => {
         const interval = setInterval(
             () => {
-            console.log("Fetching lenses");
+            // console.log("Fetching lenses");
 
             getLenses(state.first, state.offset)
                 .then((response) => {
