@@ -30,7 +30,7 @@ export const getLenses = async (first: number, offset: number) => {
 
     const lensQueryData = await response;
     
-    // console.log("Retrieved lenses: ", lensQueryData);
+    console.log("Retrieved lenses: ", lensQueryData);
     
     return lensQueryData;
 };

@@ -1,12 +1,14 @@
 import {BaseNode, LensScopeResponse} from '../../types/CustomTypes';
 import {unpackPluginNodes} from './utils_retrieveGraph/unpackPluginNodes';
-import {expandScopeQuery} from './utils_retrieveGraph/expandScopeQuery';
+import {expandLensScopeQuery} from './utils_retrieveGraph/expandLensScopeQuery';
 
 import DEV_API_EDGES from '../constants';
 import {apiFetchWithBody} from '../fetch';
 
 export const retrieveGraph = async (lens: string): Promise<(LensScopeResponse & BaseNode)> => {
-    const expandScopeQueryData = expandScopeQuery(lens);
+    const expandScopeQueryData = expandLensScopeQuery(lens);
+    console.log("lens", lens)
+    console.log("esqd", expandScopeQueryData)
 
     const lensScopeQuery = JSON.stringify({ query: expandScopeQueryData })
 

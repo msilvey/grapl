@@ -2,7 +2,7 @@
 // NOTE: Not using ts-check in this filet to support plugins. We won't always have the same.
 // type because we don't know what the data looks like. To avoid littering the codebase ":any", we're using no-check
 
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { ForceGraph2D } from "react-force-graph";
 import { retrieveGraph } from "../../services/graphQLRequests/retrieveGraphReq";
 
@@ -49,54 +49,73 @@ export const mapNodeProps = (node: Node, f: (string) => void) => {
   }
 };
 
-const updateGraph = async (
-  lensName: string,
-  state: GraphState,
-  setState: (state: GraphState) => void
-) => {
-  const curLensName = state.curLensName;
+const updateGraph = async ( lensName: string, engagementState: GraphState, setEngagementState: (engagementState: GraphState) => void, ) => {
+    if (!lensName) {
+        console.log('No lens names');
+        return;
+    }   
+    console.log("engagements tate,", engagementState)
+    const curLensName = engagementState.curLensName
+    await retrieveGraph(lensName)
+        .then(async (scope) => {
+            const update = graphQLAdjacencyMatrix(scope);
+            console.debug('update', update);
 
-  if (!lensName) {
-    console.log("No Available Lenses");
-    return;
+            const mergeUpdate = mergeGraphs(engagementState.graphData, update);
+            
+            if (mergeUpdate !== null) {
+                if (curLensName === lensName) {
+                    setEngagementState({
+                        ...engagementState,
+                        curLensName: lensName,
+                        graphData: mergeUpdate,
+                    })
+                } else {
+                    console.log("Switched lens, updating graph", engagementState.curLensName, 'ln', lensName);
+                    setEngagementState({
+                        ...engagementState,
+                        curLensName: lensName,
+                        graphData: update,
+                    })
+                }
+            }
+        }
+      )
+      .catch((e) => console.error("Failed to retrieveGraph ", e))
   }
 
-  await retrieveGraph(lensName)
-    .then(async (scope) => {
-      const update = graphQLAdjacencyMatrix(scope);
-      console.debug("state: ", state);
-      console.debug("update", update);
-
-      const mergeUpdate = mergeGraphs(state.graphData, update);
-
-      if (mergeUpdate !== null) {
-        if (curLensName === lensName) {
-          setState({
-            ...state,
-            curLensName: lensName,
-            graphData: mergeUpdate,
-          });
-        } else {
-          console.log(
-            "New Lens Selected, updating graph",
-            state.curLensName,
-            "ln",
-            lensName
-          );
-          setState({
-            ...state,
-            curLensName: lensName,
-            graphData: update,
-          });
-        }
-      }
-    })
-    .catch((e) => console.error("Failed to retrieveGraph ", e));
-};
 
 const NODE_R = 8;
 
-const GraphDisplay = () => {
+// get gData using GraplData
+const defaultGraphDisplayState = (lensName: string): GraphDisplayState => {
+  return {
+      graphData: {nodes: [], links: []},
+      curLensName: lensName,
+      intervalMap: {},
+  }
+}
+
+
+const GraphDisplay = ({lensName, setCurNode}: defaultGraphDisplayState) => {
+  const [state, setState] = React.useState(defaultGraphDisplayState(lensName));
+  console.log(state)
+  useEffect(() => {
+    const interval = setInterval(async () => {
+        if (lensName) {
+            console.debug('updating graph');
+            await updateGraph(lensName, state, setState);
+        }
+    }, 1000);
+    console.debug('setting lensName', lensName);
+    return () => {
+        clearInterval(interval);
+    };
+}, [lensName, state, setState]);
+
+
+const graphData = state.graphData
+
   const data = useMemo(() => {
     const gData = {
       nodes: [
@@ -121,6 +140,7 @@ const GraphDisplay = () => {
 
     // cross-link node objects
     gData.index = {};
+  
     gData.nodes.forEach((node) => (gData.index[node.id] = node));
 
     gData.links.forEach((link) => {
@@ -228,10 +248,9 @@ const GraphDisplay = () => {
         node.fx = null;
         node.fy = null;
 
-
-        setHoverNode(node || null)
-        setClickedNode(node || null)
-
+        setHoverNode(node || null);
+        setClickedNode(node || null);
+        // setCurNode(node);
       }}
       onNodeDragEnd={(node) => {
         node.fx = node.x;
@@ -252,6 +271,7 @@ const GraphDisplay = () => {
       nodeCanvasObject={nodeStyling}
       onNodeHover={handleNodeHover}
       onLinkHover={handleLinkHover}
+
     />
   );
 };

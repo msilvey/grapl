@@ -1,4 +1,4 @@
-export const expandScopeQuery = (lensName: string) => {
+export const expandLensScopeQuery = (lensName: string) => {
     console.log("expanding scope for: ", lensName);
 
     const query = `
@@ -82,6 +82,5 @@ export const expandScopeQuery = (lensName: string) => {
         }
     }
 `;
-
     return query;
 }

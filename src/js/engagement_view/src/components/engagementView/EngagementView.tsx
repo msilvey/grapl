@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, } from "react";
 import { Link } from "react-router-dom";
 import clsx from "clsx";
 
@@ -19,26 +19,18 @@ import { LoginNotification } from "../reusableComponents";
 import { checkLogin } from "../../services/login/checkLoginService";
 import { useStyles } from "../graphDisplay/GraphDisplayStyles";
 
+
 type EngagementViewProps = {
   setLens: (lens: string) => void;
   curLens: string;
   curNode: Node | null;
 };
 
-const defaultEngagementUxState = (): EngagementUxState => {
-  return {
-    curLens: "",
-    curNode: null,
-    loggedIn: true,
-    renderedOnce: false,
-  };
+const defaultEngagementState = (): EngagementUxState => {
+  return { curLens: "", curNode: null, loggedIn: true, renderedOnce: false, };
 };
 
-export default function EngagementView({
-  setLens,
-  curLens,
-  curNode,
-}: EngagementViewProps) {
+export default function EngagementView( {setLens, curLens, curNode,}: EngagementViewProps ) {
   const classes = useStyles();
 
   const [open, setOpen] = React.useState(true);
@@ -53,7 +45,6 @@ export default function EngagementView({
 
   return (
     <div className={classes.root}>
-      {/* <CssBaseline /> */}
       <AppBar
         position="fixed"
         className={clsx(classes.appBar, { [classes.appBarShift]: open })}
@@ -99,19 +90,16 @@ export default function EngagementView({
         <Divider />
 
         <LensAndNodeTableContainer setLens={setLens} curNode={curNode} />
+      
       </Drawer>
 
       <main
-        className={clsx(classes.content, {
-          [classes.contentShift]: open,
-        })}
+        className={clsx(classes.content, { [classes.contentShift]: open,}) }
       >
         <div className={classes.drawerHeader} />
-
-        <h3 className={classes.lensName}>
-          {/* selected lens name */}
-          {curLens || ""}
-        </h3>
+        
+        {/* selected lens name */}
+        <h3 className={classes.lensName}> {curLens || ""} </h3>
 
         <Typography paragraph></Typography>
       </main>
@@ -128,10 +116,11 @@ type EngagementUxState = {
 
 export const EngagementUx = () => {
   const classes = useStyles();
-  const [state, setState] = React.useState(defaultEngagementUxState());
+
+  const [engagementState, setEngagementState] = React.useState(defaultEngagementState());
 
   useEffect(() => {
-    if (state.renderedOnce) {
+    if (engagementState.renderedOnce) {
       return;
     }
     const interval = setInterval(async () => {
@@ -139,8 +128,8 @@ export const EngagementUx = () => {
         if (!loggedIn) {
           console.warn("Logged out");
         }
-        setState({
-          ...state,
+        setEngagementState({
+          ...engagementState,
           loggedIn: loggedIn || false,
           renderedOnce: true,
         });
@@ -149,40 +138,39 @@ export const EngagementUx = () => {
     return () => {
       clearInterval(interval);
     };
-  }, [state, setState]);
+  }, [engagementState, setEngagementState]);
 
-  const loggedIn = state.loggedIn;
+  const loggedIn = engagementState.loggedIn;
+
+  console.log("ES", engagementState)
 
   return (
     <>
       <EngagementView
-        setLens={(lens: string) =>
-          setState({
-            ...state,
+        setLens={ (lens: string) =>
+          setEngagementState({
+            ...engagementState,
             curLens: lens,
           })
         }
-        curLens={state.curLens}
-        curNode={state.curNode}
+        curLens={engagementState.curLens}
+        curNode={engagementState.curNode}
       />
+
       <>
-        
         <div className={classes.loggedIn}>
           {!loggedIn ? <LoginNotification /> : ""}
         </div>
-
-        {/* <GraphDisplay
-          lensName={state.curLens}
+        
+        <GraphDisplay
+          lensName={engagementState.curLens}
           setCurNode={(node: Node) => {
-            setState({
-              ...state,
+            setEngagementState({
+              ...engagementState,
               curNode: node,
             });
           }}
-        /> */}
-
-        <GraphDisplay />
-
+        />
       </>
     </>
   );
