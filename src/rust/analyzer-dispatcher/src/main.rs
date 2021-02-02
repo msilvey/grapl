@@ -22,9 +22,6 @@ use failure::{bail,
               Error};
 use grapl_graph_descriptions::graph_description::*;
 use grapl_observe::metric_reporter::MetricReporter;
-use lambda_runtime::{error::HandlerError,
-                     lambda,
-                     Context};
 use log::{debug,
           error,
           info,
@@ -41,16 +38,6 @@ use rusoto_sqs::{SendMessageRequest,
 use serde::{Deserialize,
             Serialize};
 use serde_json::json;
-use sqs_lambda::{cache::NopCache,
-                 completion_event_serializer::CompletionEventSerializer,
-                 event_decoder::PayloadDecoder,
-                 event_handler::{Completion,
-                                 EventHandler,
-                                 OutputEvent},
-                 local_sqs_service::local_sqs_service_with_options,
-                 local_sqs_service_options::LocalSqsServiceOptionsBuilder,
-                 sqs_completion_handler::CompletionPolicy,
-                 sqs_consumer::ConsumePolicyBuilder};
 
 #[derive(Debug)]
 pub struct AnalyzerDispatcher<S>
