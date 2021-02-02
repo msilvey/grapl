@@ -1,8 +1,6 @@
 import { Node }  from '../../../../types/CustomTypes'
 
 const getNodeLabel = (nodeType: string, node: Node) => {
-    console.log('nodetype', nodeType);
-
     const _node = node as any; // ignore-any
 
     switch(nodeType) {

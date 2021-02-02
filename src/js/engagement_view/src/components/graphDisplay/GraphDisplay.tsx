@@ -2,20 +2,20 @@
 // NOTE: Not using ts-check in this filet to support plugins. We won't always have the same.
 // type because we don't know what the data looks like. To avoid littering the codebase ":any", we're using no-check
 
-import React, { useEffect, useState, useMemo, useCallback, useRef } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { ForceGraph2D } from "react-force-graph";
 import { retrieveGraph } from "../../services/graphQLRequests/retrieveGraphReq";
 
-import { calcLinkColor } from "./utils/graphColoring/coloring.tsx";
-import { mapLabel } from "./utils/graph/labels.tsx";
-import { nodeRisk } from "./utils/calculations/node/nodeCalcs.tsx";
-import {
-  calcLinkDirectionalArrowRelPos,
-  calcLinkParticleWidth,
-} from "./utils/calculations/link/linkCalcs.tsx";
+// import { calcLinkColor } from "./utils/graphColoring/coloring.tsx";
+// import { mapLabel } from "./utils/graph/labels.tsx";
+// import { nodeRisk } from "./utils/calculations/node/nodeCalcs.tsx";
+// import {
+//   calcLinkDirectionalArrowRelPos,
+//   calcLinkParticleWidth,
+// } from "./utils/calculations/link/linkCalcs.tsx";
 import { mergeGraphs } from "./utils/graph/mergeGraphs.tsx";
 import { graphQLAdjacencyMatrix } from "./utils/graphQL/graphQLAdjacencyMatrix.tsx";
-import { Node, LinkType, GraphType } from "../../types/CustomTypes.tsx";
+import { Node, GraphType } from "../../types/CustomTypes.tsx";
 
 type GraphDisplayProps = {
   lensName: string | null;
@@ -54,7 +54,7 @@ const updateGraph = async ( lensName: string, engagementState: GraphState, setEn
         console.log('No lens names');
         return;
     }   
-    console.log("engagements tate,", engagementState)
+    console.log("engagement state,", engagementState)
     const curLensName = engagementState.curLensName
     await retrieveGraph(lensName)
         .then(async (scope) => {
@@ -99,7 +99,7 @@ const defaultGraphDisplayState = (lensName: string): GraphDisplayState => {
 
 const GraphDisplay = ({lensName, setCurNode}: defaultGraphDisplayState) => {
   const [state, setState] = React.useState(defaultGraphDisplayState(lensName));
-  console.log(state)
+
   useEffect(() => {
     const interval = setInterval(async () => {
         if (lensName) {
@@ -113,72 +113,63 @@ const GraphDisplay = ({lensName, setCurNode}: defaultGraphDisplayState) => {
     };
 }, [lensName, state, setState]);
 
+const data = state.graphData
 
-const graphData = state.graphData
+const data = useMemo(() => {
+  const graphData = state.graphData;
 
-  const data = useMemo(() => {
-    const gData = {
-      nodes: [
-        { id: "Process1" },
-        { id: "Process2" },
-        { id: "Evil.exe" },
-        { id: "DesktopFVJR" },
-        { id: "DesktopGAGA" },
-        { id: "main.txt" },
-        { id: "Chrome" },
-      ],
-      links: [
-        { source: "Process1", target: "Process2" },
-        { source: "Process1", target: "Evil.exe" },
-        { source: "DesktopFVJR", target: "Evil.exe" },
-        { source: "Process2", target: "DesktopFVJR" },
-        { source: "DesktopGAGA", target: "Process1" },
-        { source: "Chrome", target: "Process1" },
-        { source: "main.txt", target: "Chrome" },
-      ],
-    };
+  graphData.index = {};
+  graphData.nodes.forEach(node => graphData.index[node.id] = node);
 
-    // cross-link node objects
-    gData.index = {};
-  
-    gData.nodes.forEach((node) => (gData.index[node.id] = node));
+  // cross-link node objects
+  graphData.links.forEach(link => {
+    
+    console.log("nodes in graph data ", graphData.nodes)
+    console.log("hardcoded data", graphData.index[50019])
+    console.log("link", link)
+    console.log("link.source", link.source)
 
-    gData.links.forEach((link) => {
-      const a = gData.index[link.source];
-      const b = gData.index[link.target];
+    // undefined
+    const a = graphData.index[link.source];
+    const b = graphData.index[link.target];
 
-      !a.neighbors && (a.neighbors = []);
-      !b.neighbors && (b.neighbors = []);
+    console.log("a", a);
+    console.log("b", b);
 
-      a.neighbors.push(b);
-      b.neighbors.push(a);
+    !a.neighbors && (a.neighbors = []);
+    !b.neighbors && (b.neighbors = []);
+    
+    a.neighbors.push(b);
+    b.neighbors.push(a);
 
-      !a.links && (a.links = []);
-      !b.links && (b.links = []);
+    !a.links && (a.links = []);
+    !b.links && (b.links = []);
+    
+    a.links.push(link);
+    b.links.push(link);
+  });
 
-      a.links.push(link);
-      b.links.push(link);
-    });
+  return graphData;
+});
 
-    return gData;
-  }, []);
 
   const [highlightNodes, setHighlightNodes] = useState(new Set());
   const [highlightLinks, setHighlightLinks] = useState(new Set());
   const [hoverNode, setHoverNode] = useState(null);
   const [clickedNode, setClickedNode] = useState(new Set());
 
-  const hoveredNode = new Set(); 
+  // const hoveredNode = new Set(); 
 
   const updateHighlight = () => {
     setHighlightNodes(highlightNodes);
     setHighlightLinks(highlightLinks);
   };
 
-  const handleNodeHover = (node) => {
+  const handleNodeHover = node => {
     highlightNodes.clear();
     highlightLinks.clear();
     if (node) {
+      console.log("current node", node)
       highlightNodes.add(node);
       node.neighbors.forEach((neighbor) => highlightNodes.add(neighbor));
       node.links.forEach((link) => highlightLinks.add(link));
@@ -187,7 +178,7 @@ const graphData = state.graphData
     updateHighlight();
   };
 
-  const handleLinkHover = (link) => {
+  const handleLinkHover = link => {
     highlightNodes.clear();
     highlightLinks.clear();
 
@@ -235,7 +226,7 @@ const graphData = state.graphData
       ctx.fillStyle = "white";
       ctx.fillText(label, node.x, node.y);
     },
-    [hoverNode, hoveredNode, clickedNode] 
+    [hoverNode,clickedNode] 
   );
 
   return (
@@ -250,7 +241,6 @@ const graphData = state.graphData
 
         setHoverNode(node || null);
         setClickedNode(node || null);
-        // setCurNode(node);
       }}
       onNodeDragEnd={(node) => {
         node.fx = node.x;
@@ -271,7 +261,6 @@ const graphData = state.graphData
       nodeCanvasObject={nodeStyling}
       onNodeHover={handleNodeHover}
       onLinkHover={handleLinkHover}
-
     />
   );
 };

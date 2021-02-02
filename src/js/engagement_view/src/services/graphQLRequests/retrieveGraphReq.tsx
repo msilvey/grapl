@@ -7,9 +7,7 @@ import {apiFetchWithBody} from '../fetch';
 
 export const retrieveGraph = async (lens: string): Promise<(LensScopeResponse & BaseNode)> => {
     const expandScopeQueryData = expandLensScopeQuery(lens);
-    console.log("lens", lens)
-    console.log("esqd", expandScopeQueryData)
-
+    
     const lensScopeQuery = JSON.stringify({ query: expandScopeQueryData })
 
     const queryResponse = 
