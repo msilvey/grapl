@@ -1,4 +1,4 @@
-import {Node} from './CustomTypes'
+import {VizNode} from './CustomTypes'
 
 export type SelectLensProps = {
     lens: string,
@@ -9,14 +9,14 @@ export type SelectLensProps = {
 }
 
 export type NodeDetailsProps = {
-    node: Node
+    node: VizNode
 }
 
 export type ToggleNodeTableProps = {
-    curNode: Node | null
+    curNode: VizNode | null
 }
 
 export type EngagementViewProps = {
     setLens: (lens: string) => void, 
-    curNode: Node | null
+    curNode: VizNode | null
 }

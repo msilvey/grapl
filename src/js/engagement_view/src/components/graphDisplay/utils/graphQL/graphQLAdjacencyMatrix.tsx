@@ -1,88 +1,15 @@
 import { traverseNodes, traverseNeighbors, mapEdges } from "../graph/graph_traverse"
 import { getNodeLabel } from '../graph/labels';
-import {LensScopeResponse, BaseNode} from "../../../../types/CustomTypes"
+import {Lens, Link, VizGraph, BaseNodeProperties, VizNode, Node, Risk} from "../../../../types/CustomTypes"
 
-interface IVizNode {
-    uid: number,
-    name: number,
-    id: number, 
-    nodeType: string,
-    nodeLabel: string,
-    x: number,
-    y: number,
-}
+const getNodeType = (node: BaseNodeProperties) => {
+    const dgraphType = node.dgraph_type;
 
-interface VizProcessNode extends IVizNode {
-    process_id: number,
-    process_name: string,
-    created_timestamp: number, 
-    terminate_time: number,
-    image_name: string, 
-    arguments: string,
-}
-
-export interface File extends IVizNode {
-    file_name: string,
-    file_path: string,
-    file_extension: string,
-    file_mime_type: string,
-    file_size: number,
-    file_version: string, 
-    file_description: string,
-    file_product: string,
-    file_company: string, 
-    file_directory: string,
-    file_inode: number,
-    file_hard_links: string, 
-    signed: boolean,
-    signed_status: string, 
-    md5_hash: string,
-    sha1_hash: string,
-    sha256_hash: string,
-}
-
-export interface IpConnections extends IVizNode {
-    src_ip_addr: string,
-    src_port: string,
-    dst_ip_addr: string,
-    dst_port: string,
-    created_timestamp: number,
-    terminated_timestamp: number,
-    last_seen_timestamp: number,
-}
-interface VizAssetNode extends IVizNode {
-    hostname: string,
-}
-
-interface VizLensNode extends IVizNode {
-    lens_name: string,
-    lens_type: string, 
-}
-
-type VizDynamicNode = IVizNode;
-
-type VizNode = VizProcessNode | VizAssetNode | VizLensNode | VizDynamicNode;
-
-type VizLink = {
-    source: number,
-    label: string,
-    target: number, 
-}
-
-type AdjacencyMatrix = {
-    nodes: VizNode[],
-    links: VizLink[]
-}
-
-
-const getNodeType = (node: BaseNode) => {
-    const t = node.dgraph_type || node.node_type;
-
-    if (t) {
-        if (Array.isArray(t)) {
-            return t[0]
+    if (dgraphType) {
+        if (Array.isArray(dgraphType)) {
+            return dgraphType[0]
         }
-        return t
+        return dgraphType
     }
 
     console.warn('Unable to find type for node ', node);
@@ -96,15 +23,14 @@ function randomInt(min: number, max: number) // min and max included
 }
 
 
-export const graphQLAdjacencyMatrix = (inputGraph: (LensScopeResponse & BaseNode)): AdjacencyMatrix => {
-
+export const vizGraphFromLensScope = (inputGraph: Lens): VizGraph => {
     const nodes: VizNode[] = []; 
-    const links: VizLink[] = [];
-
+    const links: Link[] = [];
     const nodeMap: Map<number, VizNode> = new Map();
 
-    traverseNeighbors(inputGraph, 
-        (fromNode: BaseNode, edgeName: string, toNode: BaseNode) => {
+    traverseNeighbors(
+        inputGraph, 
+        (fromNode, edgeName, toNode) => {
             if(edgeName !== 'scope'){
                 
                 if(getNodeType(fromNode) === 'Unknown'){
@@ -125,13 +51,13 @@ export const graphQLAdjacencyMatrix = (inputGraph: (LensScopeResponse & BaseNode
                 
                 links.push({
                     source: fromNode.uid,
-                    label: edgeName, 
+                    name: edgeName, 
                     target: toNode.uid
                 })
         } 
     })
 
-    traverseNodes(inputGraph, (node: BaseNode) => {
+    traverseNodes(inputGraph, (node) => {
         const nodeType = getNodeType(node);
 
         if(nodeType === 'Unknown'){
@@ -146,21 +72,22 @@ export const graphQLAdjacencyMatrix = (inputGraph: (LensScopeResponse & BaseNode
 
         const strippedNode = {...node};
 
-        strippedNode.risk = strippedNode.risk || 0;
-        strippedNode.analyzer_names = strippedNode.analyzer_names || "";
+        let riskScore = (node["risk"] || 0) as number;
+        let analyzerNames = "";
+        let nodeRisks = (node["risks"] || []) as Risk[];
+    
+        for(const riskNode of nodeRisks){
+            riskScore += riskNode.risk_score || 0;
 
-        for(const risk of node.risks || []){
-            strippedNode.risk += risk.risk_score || 0;
-            if (strippedNode.analyzer_names && risk.analyzer_name) {
-                // #TODO: Link to the analyzer details
-                strippedNode.analyzer_names += ", "
+            if (analyzerNames && riskNode.analyzer_name) {
+                analyzerNames += ", "
             }
-            strippedNode.analyzer_names += risk.analyzer_name || "";
+            
+            analyzerNames += riskNode.analyzer_name || "";
         }
 
-        mapEdges(node, (edge: string, _neighbor: BaseNode) => {
-            // The stripped node is being converted to another type, so we can cast
-            // to any here
+        mapEdges(node, (edge: string, _neighbor:  Node) => {
+            // The stripped node is converted to another type, so we can cast to any here
             (strippedNode as any)[edge] = undefined;
         })
 
@@ -169,20 +96,26 @@ export const graphQLAdjacencyMatrix = (inputGraph: (LensScopeResponse & BaseNode
             x: 200 + randomInt(1, 5),
             y: 150 + randomInt(1, 5),
             ...strippedNode,
+            riskScore,
+            analyzerNames,
             id: node.uid,
             nodeType,
             nodeLabel,
         };
 
-        nodeMap.set(node.uid, vizNode);
+        nodeMap.set(node.uid, vizNode as unknown as VizNode); // as unknown handles destructuring. 
     })
 
-    for (const vizNode of (nodeMap.values() as any)) {
-        nodes.push(vizNode)
+    const index = {} as {[key: number]: VizNode};
+
+    for (const vizNode of (nodeMap.values())) {
+        index[vizNode.uid] = vizNode;
+        nodes.push(vizNode);
     }
 
     return {
         nodes, 
-        links
+        links,
+        index,
     }
 }

@@ -1,4 +1,4 @@
-import {BaseNode} from '../../../types/CustomTypes'
+import {Node} from '../../../types/CustomTypes'
 import {mapGraph} from "components/graphDisplay/utils/graph/graph_traverse";
 
 const builtins = new Set([
@@ -12,7 +12,7 @@ const builtins = new Set([
     'ProcessOutboundConnections',
 ])
 
-export const unpackPluginNodes = (nodes: BaseNode[]) => {
+export const unpackPluginNodes = (nodes: Node[]) => {
     for (const node of nodes) {
         if (!(node as any).predicates) {
             continue

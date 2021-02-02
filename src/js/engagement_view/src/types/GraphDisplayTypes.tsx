@@ -1,15 +1,16 @@
+import {VizGraph, VizNode} from "./CustomTypes"; 
+
 export type GraphDisplayProps = {
     lensName: string | null,
-    setCurNode: string | void,
+    setCurNode: (node: VizNode) => void,
 }
 
 export type GraphDisplayState = {
-    graphData: any,
+    graphData: VizGraph,
     curLensName: string | null,
-    lensSelected: boolean 
 }
 
 export type GraphState = {
     curLensName: string, 
-    graphData: any
+    graphData: VizGraph,
 }

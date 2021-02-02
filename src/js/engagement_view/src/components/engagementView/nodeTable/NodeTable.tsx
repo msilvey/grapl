@@ -9,7 +9,7 @@ import TableRow from '@material-ui/core/TableRow';
 import { mapEdgeProps } from '../../graphDisplay/utils/graph/graph_traverse';
 import { mapNodeProps } from '../../graphDisplay/GraphDisplay';
 
-import { Node } from "types/CustomTypes";
+import { OtherNodeProperties, VizNode } from "types/CustomTypes";
 
 import { tableHeader } from "./nodeTableHeader";
 import { nodeTableStyles } from "./styles"; 
@@ -17,7 +17,7 @@ import { nodeTableStyles } from "./styles";
 const useStyles = nodeTableStyles; 
 
 type NodeTableProps = {
-    node: Node
+    node: VizNode
 }
 
 function NodeTable({node}: NodeTableProps){
@@ -26,16 +26,12 @@ function NodeTable({node}: NodeTableProps){
         ['id', 'dgraph.type', 'dgraph_type', '__indexColor', 'risks','uid', 'scope', 'name', 'nodeType', 'nodeLabel', 'x', 'y', 'index', 'vy', 'vx', 'fx', 'fy']
     );
 
-    mapEdgeProps(node, (edgeName: string, _neighbor: Node) => {
-        hidden.add(edgeName)
-    });
-
-    const displayNode = {} as any;
+    const displayNode = {} as OtherNodeProperties;
 
     mapNodeProps(
         node, 
         (propName: string) => {
-            const prop = (node as any)[propName];
+            const prop = node[propName];
 
             if(!hidden.has(propName)){
                 if (prop) {

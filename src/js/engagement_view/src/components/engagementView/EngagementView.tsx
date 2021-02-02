@@ -12,7 +12,7 @@ import KeyboardArrowLeftIcon from "@material-ui/icons/KeyboardArrowLeft";
 import Button from "@material-ui/core/Button";
 import Home from "@material-ui/icons/Home";
 
-import { Node } from "types/CustomTypes";
+import { Node, VizNode } from "types/CustomTypes";
 import GraphDisplay from "../graphDisplay/GraphDisplay";
 import LensAndNodeTableContainer from "./sidebar/LensAndNodeTableContainer";
 import { LoginNotification } from "../reusableComponents";
@@ -23,7 +23,7 @@ import { useStyles } from "../graphDisplay/GraphDisplayStyles";
 type EngagementViewProps = {
   setLens: (lens: string) => void;
   curLens: string;
-  curNode: Node | null;
+  curNode: VizNode | null;
 };
 
 const defaultEngagementState = (): EngagementUxState => {
@@ -109,7 +109,7 @@ export default function EngagementView( {setLens, curLens, curNode,}: Engagement
 
 type EngagementUxState = {
   curLens: string;
-  curNode: Node | null;
+  curNode: VizNode | null;
   loggedIn: boolean;
   renderedOnce: boolean;
 };
@@ -164,7 +164,7 @@ export const EngagementUx = () => {
         
         <GraphDisplay
           lensName={engagementState.curLens}
-          setCurNode={(node: Node) => {
+          setCurNode={(node) => {
             setEngagementState({
               ...engagementState,
               curNode: node,
