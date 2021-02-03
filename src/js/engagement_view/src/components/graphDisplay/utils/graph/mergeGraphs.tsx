@@ -1,5 +1,5 @@
 import {mapNodeProps} from '../../GraphDisplay';
-import {VizGraph, VizNode, Node} from '../../../../types/CustomTypes'; 
+import {VizGraph, VizNode} from '../../../../types/CustomTypes'; 
 
 // merges y into x, returns true if update occurred
 const mergeNodes = (x: VizNode, y: VizNode) => {
@@ -12,15 +12,15 @@ const mergeNodes = (x: VizNode, y: VizNode) => {
             }
         }
     });
-
     return merged;
 };
 
-export const mergeGraphs = (curGraph: VizGraph, update: VizGraph): VizGraph | null => {
+
+export const mergeGraphs = (curGraph: VizGraph, graphUpdate: VizGraph): VizGraph | null => {
     // Merges two graphs into a new graph
     // returns 'null' if there are no updates to be made
 
-    if (!update.nodes && !update.links) {
+    if (!graphUpdate.nodes && !graphUpdate.links) {
         // empty update
         return null
     }
@@ -36,7 +36,7 @@ export const mergeGraphs = (curGraph: VizGraph, update: VizGraph): VizGraph | nu
         nodes.set(node.uid, node)
     }
 
-    for (const newNode of update.nodes) {
+    for (const newNode of graphUpdate.nodes) {
         const node = nodes.get(newNode.uid);
         if (node) {
             if (mergeNodes(node, newNode)) {
@@ -60,7 +60,7 @@ export const mergeGraphs = (curGraph: VizGraph, update: VizGraph): VizGraph | nu
         }
     }
 
-    for (const newLink of update.links) {
+    for (const newLink of graphUpdate.links) {
         const newLinkSource =  newLink.source || newLink.source;
         const newLinkTarget =  newLink.target || newLink.target;
         const link = links.get(newLinkSource + newLink.name + newLinkTarget);

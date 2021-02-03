@@ -9,6 +9,7 @@ export const expandLensScopeQuery = (lensName: string) => {
             lens_name,
             lens_type,
             dgraph_type,
+            score,
             scope {
                 ... on Process {
                     uid,

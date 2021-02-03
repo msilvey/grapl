@@ -117,30 +117,15 @@ def create_edge(
 
 def recalculate_score(lens: LensView) -> int:
     scope = lens.get_scope()
-    key_to_analyzers = defaultdict(set)
-    node_risk_scores = defaultdict(int)
-    total_risk_score = 0
+    score = 1
     for node in scope:
         node_risks = node.get_risks()
-        risks_by_analyzer = {}
-        for risk in node_risks:
-            risk_score = risk.get_risk_score()
-            analyzer_name = risk.get_analyzer_name()
-            risks_by_analyzer[analyzer_name] = risk_score
-            key_to_analyzers[node.node_key].add(analyzer_name)
-
-        analyzer_risk_sum = sum([a for a in risks_by_analyzer.values() if a])
-        node_risk_scores[node.node_key] = analyzer_risk_sum
-        total_risk_score += analyzer_risk_sum
-
-    # Bonus is calculated by finding nodes with multiple analyzers
-    for key, analyzers in key_to_analyzers.items():
-        if len(analyzers) <= 1:
-            continue
-        overlapping_analyzer_count = len(analyzers)
-        bonus = node_risk_scores[key] * 2 * (overlapping_analyzer_count // 100)
-        total_risk_score += bonus
-    return total_risk_score
+        node_score = 1
+        for node_risk in node_risks:
+            node_score += node_risk.get_risk_score()
+        score += node_score
+        score += round((len(node_risks) / 50) * node_score)
+    return score
 
 
 def _upsert(client: GraphClient, node_dict: Dict[str, Any]) -> str:
@@ -324,7 +309,18 @@ def _process_one_event(
             create_edge(mg_client, from_uid, edge_name, to_uid)
 
     for lens in lenses.values():
-        recalculate_score(lens)
+        new_score = recalculate_score(lens)
+        print("setting lens score to ", new_score)
+        upsert(
+            mg_client,
+            "Lens",
+            LensView,
+            lens.node_key,
+            {
+                "node_key": lens.node_key,
+                "score": new_score,
+            },
+        )
 
 
 def main() -> None:

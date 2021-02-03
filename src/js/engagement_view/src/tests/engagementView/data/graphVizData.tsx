@@ -1,0 +1,123 @@
+export const graphVizData = {
+	uid: 50132,
+	node_key: "lens-hostnameDESKTOP-FVSHABR",
+	lens_name: "DESKTOP-FVSHABR",
+	lens_type: "hostname",
+	dgraph_type: ["Lens"],
+	score: 273, 
+	scope: [
+		{
+			uid: 50013,
+			node_key: "99be8f6a-5330-4099-b72f-7a560c3711eb",
+			dgraph_type: ["Process"],
+			process_name: "svchost.exe",
+			process_id: 6132,
+			children: null,
+			risks: null,
+		},
+		{
+			uid: 50019,
+			node_key: "9cecebd1-eaac-4a93-a8a3-8c9a5de922b1",
+			dgraph_type: ["Process"],
+			process_name: "dropper.exe",
+			process_id: 4164,
+			children: [
+				{
+					uid: 50030,
+					node_key: "18ca3c40-0b7b-4800-8282-9e6255681e2e",
+					dgraph_type: ["Process"],
+					process_name: "cmd.exe",
+					process_id: 5824,
+				},
+			],
+			risks: [
+				{
+					uid: 50138,
+					dgraph_type: ["Risk"],
+					node_key: "Rare Parent of cmd.exe",
+					analyzer_name: "Rare Parent of cmd.exe",
+					risk_score: 10,
+				},
+			],
+		},
+		{
+			uid: 50030,
+			node_key: "18ca3c40-0b7b-4800-8282-9e6255681e2e",
+			dgraph_type: ["Process"],
+			process_name: "cmd.exe",
+			process_id: 5824,
+			children: [
+				{
+					uid: 50013,
+					node_key: "99be8f6a-5330-4099-b72f-7a560c3711eb",
+					dgraph_type: ["Process"],
+					process_name: "svchost.exe",
+					process_id: 6132,
+				},
+			],
+			risks: [
+				{
+					uid: 50133,
+					dgraph_type: ["Risk"],
+					node_key: "Suspicious svchost",
+					analyzer_name: "Suspicious svchost",
+					risk_score: 75,
+				},
+				{
+					uid: 50138,
+					dgraph_type: ["Risk"],
+					node_key: "Rare Parent of cmd.exe",
+					analyzer_name: "Rare Parent of cmd.exe",
+					risk_score: 10,
+				},
+			],
+		},
+		{
+			uid: 50037,
+			node_key: "DESKTOP-FVSHABR",
+			dgraph_type: ["Asset"],
+			hostname: "DESKTOP-FVSHABR",
+			asset_ip: null,
+			asset_processes: [
+				{
+					uid: 50013,
+					node_key: "99be8f6a-5330-4099-b72f-7a560c3711eb",
+					dgraph_type: ["Process"],
+					process_name: "svchost.exe",
+					process_id: 6132,
+				},
+				{
+					uid: 50019,
+					node_key: "9cecebd1-eaac-4a93-a8a3-8c9a5de922b1",
+					dgraph_type: ["Process"],
+					process_name: "dropper.exe",
+					process_id: 4164,
+				},
+				{
+					uid: 50030,
+					node_key: "18ca3c40-0b7b-4800-8282-9e6255681e2e",
+					dgraph_type: ["Process"],
+					process_name: "cmd.exe",
+					process_id: 5824,
+				},
+			],
+			files_on_asset: null,
+			risks: [
+				{
+					uid: 50133,
+					dgraph_type: ["Risk"],
+					node_key: "Suspicious svchost",
+					analyzer_name: "Suspicious svchost",
+					risk_score: 75,
+				},
+				{
+					uid: 50138,
+					dgraph_type: ["Risk"],
+					node_key: "Rare Parent of cmd.exe",
+					analyzer_name: "Rare Parent of cmd.exe",
+					risk_score: 10,
+				},
+			],
+		},
+	],
+};

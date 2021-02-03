@@ -1,121 +1,120 @@
-import { traverseNodes, traverseNeighbors, mapEdges } from "../graph/graph_traverse"
-import { getNodeLabel } from '../graph/labels';
-import {Lens, Link, VizGraph, BaseNodeProperties, VizNode, Node, Risk} from "../../../../types/CustomTypes"
+import {
+	traverseNodes,
+	traverseNeighbors,
+	mapEdges,
+} from "../graph/graph_traverse";
 
-const getNodeType = (node: BaseNodeProperties) => {
-    const dgraphType = node.dgraph_type;
+import { getNodeLabel } from "../graph/labels";
 
-    if (dgraphType) {
-        if (Array.isArray(dgraphType)) {
-            return dgraphType[0]
-        }
-        return dgraphType
-    }
+import {
+	Lens,
+	Link,
+	VizGraph,
+	BaseNodeProperties,
+	VizNode,
+	Node,
+	Risk,
+} from "../../../../types/CustomTypes";
 
-    console.warn('Unable to find type for node ', node);
-    return 'Unknown';
+export const getNodeType = (node: BaseNodeProperties) => {
+	const dgraphType = node.dgraph_type;
+
+	if (dgraphType) {
+		if (Array.isArray(dgraphType)) {
+			return dgraphType[0];
+		}
+		return dgraphType;
+	}
+
+	console.warn("Unable to find type for node ", node);
+	return "Unknown Type";
 };
 
-function randomInt(min: number, max: number) // min and max included
-{
-    let randomNum: number = Math.floor(Math.random() * (max - min + 1) + min);
-    return randomNum;
+function randomInt(min: number, max: number) {
+	let randomNum: number = Math.floor(Math.random() * (max - min + 1) + min);
+
+	return randomNum;
 }
 
+// #TODO: write a fucntion to validate data
+export const vizGraphFromLensScope = (vizGraphData: Lens): VizGraph => {
+	console.log("VizGraphData", vizGraphData)
+	const nodes: VizNode[] = [];
+	const links: Link[] = [];
+	const vizNodeMap: Map<number, VizNode> = new Map();
 
-export const vizGraphFromLensScope = (inputGraph: Lens): VizGraph => {
-    const nodes: VizNode[] = []; 
-    const links: Link[] = [];
-    const nodeMap: Map<number, VizNode> = new Map();
+	traverseNeighbors(vizGraphData, (fromNode, edgeName, toNode) => {
+		if (edgeName !== "scope") {
+			if (
+				getNodeType(fromNode) === "Unknown" ||
+				getNodeType(toNode) === "Unknown" ||
+				getNodeType(fromNode) === "Risk" ||
+				getNodeType(toNode) === "Risk"
+			) {
+				return;
+			}
 
-    traverseNeighbors(
-        inputGraph, 
-        (fromNode, edgeName, toNode) => {
-            if(edgeName !== 'scope'){
-                
-                if(getNodeType(fromNode) === 'Unknown'){
-                    return;
-                }
+			links.push({
+				source: fromNode.uid,
+				name: edgeName,
+				target: toNode.uid,
+			});
+		}
+	});
 
-                if(getNodeType(toNode) === 'Unknown'){
-                    return;
-                }
+	traverseNodes(vizGraphData, (node) => {
+		const nodeType = getNodeType(node);
+		if (nodeType === "Unknown" || nodeType === "Risk") {
+			return;
+		}
 
-                if(getNodeType(fromNode) === 'Risk'){
-                    return;
-                }
+		const nodeLabel = getNodeLabel(nodeType, node);
+		const strippedNode = { ...node };
 
-                if(getNodeType(toNode) === 'Risk'){
-                    return;
-                }
-                
-                links.push({
-                    source: fromNode.uid,
-                    name: edgeName, 
-                    target: toNode.uid
-                })
-        } 
-    })
+		let riskScore = (node["risk"] || 0) as number;
+		let analyzerNames = "";
+		let nodeRiskList = (node["risks"] || []) as Risk[];
 
-    traverseNodes(inputGraph, (node) => {
-        const nodeType = getNodeType(node);
+		for (const riskNode of nodeRiskList) {
+			riskScore += riskNode.risk_score || 0;
 
-        if(nodeType === 'Unknown'){
-            return;
-        }
+			if (analyzerNames && riskNode.analyzer_name) {
+				analyzerNames += ", ";
+			}
 
-        if(nodeType === 'Risk'){
-            return; 
-        }
+			analyzerNames += riskNode.analyzer_name || "";
+		}
 
-        const nodeLabel = getNodeLabel(nodeType, node);
+		mapEdges(node, (edge: string, _neighbor: Node) => {
+			// The stripped node is converted to another type, so we can cast to any here
+			(strippedNode as any)[edge] = undefined;
+		});
 
-        const strippedNode = {...node};
+		const vizNode = {
+			name: node.uid,
+			x: 200 + randomInt(1, 5),
+			y: 150 + randomInt(1, 5),
+			...strippedNode,
+			riskScore,
+			analyzerNames,
+			id: node.uid,
+			nodeType,
+			nodeLabel,
+		};
 
-        let riskScore = (node["risk"] || 0) as number;
-        let analyzerNames = "";
-        let nodeRisks = (node["risks"] || []) as Risk[];
-    
-        for(const riskNode of nodeRisks){
-            riskScore += riskNode.risk_score || 0;
+		vizNodeMap.set(node.uid, (vizNode as unknown) as VizNode); // as unknown handles destructuring.
+	});
 
-            if (analyzerNames && riskNode.analyzer_name) {
-                analyzerNames += ", "
-            }
-            
-            analyzerNames += riskNode.analyzer_name || "";
-        }
+	const index = {} as { [key: number]: VizNode };
 
-        mapEdges(node, (edge: string, _neighbor:  Node) => {
-            // The stripped node is converted to another type, so we can cast to any here
-            (strippedNode as any)[edge] = undefined;
-        })
+	for (const vizNode of vizNodeMap.values()) {
+		index[vizNode.uid] = vizNode;
+		nodes.push(vizNode);
+	}
 
-        const vizNode = {
-            name: node.uid,
-            x: 200 + randomInt(1, 5),
-            y: 150 + randomInt(1, 5),
-            ...strippedNode,
-            riskScore,
-            analyzerNames,
-            id: node.uid,
-            nodeType,
-            nodeLabel,
-        };
-
-        nodeMap.set(node.uid, vizNode as unknown as VizNode); // as unknown handles destructuring. 
-    })
-
-    const index = {} as {[key: number]: VizNode};
-
-    for (const vizNode of (nodeMap.values())) {
-        index[vizNode.uid] = vizNode;
-        nodes.push(vizNode);
-    }
-
-    return {
-        nodes, 
-        links,
-        index,
-    }
-}
+	return {
+		nodes,
+		links,
+		index,
+	};
+};
