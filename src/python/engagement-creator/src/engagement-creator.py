@@ -310,7 +310,6 @@ def _process_one_event(
 
     for lens in lenses.values():
         new_score = recalculate_score(lens)
-        print("setting lens score to ", new_score)
         upsert(
             mg_client,
             "Lens",

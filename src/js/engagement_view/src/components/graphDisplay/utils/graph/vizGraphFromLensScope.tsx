@@ -2,9 +2,9 @@ import {
 	traverseNodes,
 	traverseNeighbors,
 	mapEdges,
-} from "../graph/graph_traverse";
+} from "./graph_traverse";
 
-import { getNodeLabel } from "../graph/labels";
+import { getNodeLabel } from "./labels";
 
 import {
 	Lens,
@@ -30,15 +30,14 @@ export const getNodeType = (node: BaseNodeProperties) => {
 	return "Unknown Type";
 };
 
-function randomInt(min: number, max: number) {
-	let randomNum: number = Math.floor(Math.random() * (max - min + 1) + min);
+// function randomInt(min: number, max: number) {
+// 	let randomNum: number = Math.floor(Math.random() * (max - min + 1) + min);
 
-	return randomNum;
-}
+// 	return randomNum;
+// }
 
 // #TODO: write a fucntion to validate data
 export const vizGraphFromLensScope = (vizGraphData: Lens): VizGraph => {
-	console.log("VizGraphData", vizGraphData)
 	const nodes: VizNode[] = [];
 	const links: Link[] = [];
 	const vizNodeMap: Map<number, VizNode> = new Map();
@@ -53,7 +52,6 @@ export const vizGraphFromLensScope = (vizGraphData: Lens): VizGraph => {
 			) {
 				return;
 			}
-
 			links.push({
 				source: fromNode.uid,
 				name: edgeName,
@@ -64,6 +62,7 @@ export const vizGraphFromLensScope = (vizGraphData: Lens): VizGraph => {
 
 	traverseNodes(vizGraphData, (node) => {
 		const nodeType = getNodeType(node);
+
 		if (nodeType === "Unknown" || nodeType === "Risk") {
 			return;
 		}
@@ -81,7 +80,6 @@ export const vizGraphFromLensScope = (vizGraphData: Lens): VizGraph => {
 			if (analyzerNames && riskNode.analyzer_name) {
 				analyzerNames += ", ";
 			}
-
 			analyzerNames += riskNode.analyzer_name || "";
 		}
 
@@ -92,8 +90,8 @@ export const vizGraphFromLensScope = (vizGraphData: Lens): VizGraph => {
 
 		const vizNode = {
 			name: node.uid,
-			x: 200 + randomInt(1, 5),
-			y: 150 + randomInt(1, 5),
+			// x: 200 + randomInt(1, 5),
+			// y: 150 + randomInt(1, 5), // #TODO: might need to add these back, coordinates to add new nodes
 			...strippedNode,
 			riskScore,
 			analyzerNames,
@@ -111,7 +109,7 @@ export const vizGraphFromLensScope = (vizGraphData: Lens): VizGraph => {
 		index[vizNode.uid] = vizNode;
 		nodes.push(vizNode);
 	}
-
+	// Return data in format for react-force-graph display 
 	return {
 		nodes,
 		links,

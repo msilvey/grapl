@@ -1,9 +1,12 @@
 import {mapNodeProps} from '../../GraphDisplay';
 import {VizGraph, VizNode} from '../../../../types/CustomTypes'; 
 
-// merges y into x, returns true if update occurred
-const mergeNodes = (x: VizNode, y: VizNode) => {
+// if graph has updated, merge y into x
+export const mergeNodes = (x: VizNode, y: VizNode) => {
     let merged = false;
+    console.log("X", JSON.stringify(x)); 
+    console.log("Y", JSON.stringify(y));
+
     mapNodeProps(y, (prop: string) => {
         if (!Object.prototype.hasOwnProperty.call(x, prop)) {
             if ((x as any)[prop] !== (y as any)[prop]) {
@@ -12,6 +15,7 @@ const mergeNodes = (x: VizNode, y: VizNode) => {
             }
         }
     });
+    console.log("merged", merged)
     return merged;
 };
 
@@ -21,14 +25,12 @@ export const mergeGraphs = (curGraph: VizGraph, graphUpdate: VizGraph): VizGraph
     // returns 'null' if there are no updates to be made
 
     if (!graphUpdate.nodes && !graphUpdate.links) {
-        // empty update
         return null
     }
 
-    const outputGraph: VizGraph = {nodes: [], links: [], index: []};
-
     let updated = false;
 
+    const outputGraph: VizGraph = {nodes: [], links: [], index: []};
     const nodes = new Map();
     const links = new Map();
 

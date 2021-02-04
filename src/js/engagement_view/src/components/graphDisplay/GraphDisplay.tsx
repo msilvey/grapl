@@ -13,7 +13,7 @@ import { retrieveGraph } from "../../services/graphQLRequests/retrieveGraphReq";
 //   calcLinkParticleWidth,
 // } from "./utils/calculations/link/linkCalcs.tsx";
 import { mergeGraphs } from "./utils/graph/mergeGraphs";
-import { vizGraphFromLensScope } from "./utils/graphQL/graphQLAdjacencyMatrix";
+import { vizGraphFromLensScope } from "./utils/graph/vizGraphFromLensScope";
 import { Link, NodeProperties, VizNode } from "../../types/CustomTypes";
 import {
 	GraphState,
