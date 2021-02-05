@@ -113,8 +113,6 @@ const GraphDisplay = ({lensName, setCurNode}: defaultGraphDisplayState) => {
     };
 }, [lensName, state, setState]);
 
-const data = state.graphData
-
 const data = useMemo(() => {
   const graphData = state.graphData;
 
