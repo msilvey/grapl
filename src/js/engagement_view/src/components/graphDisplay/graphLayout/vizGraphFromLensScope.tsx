@@ -14,7 +14,7 @@ import {
 	VizNode,
 	Node,
 	Risk,
-} from "../../../../types/CustomTypes";
+} from "../../../types/CustomTypes";
 
 export const getNodeType = (node: BaseNodeProperties) => {
 	const dgraphType = node.dgraph_type;
@@ -52,6 +52,7 @@ export const vizGraphFromLensScope = (vizGraphData: Lens): VizGraph => {
 			) {
 				return;
 			}
+			
 			links.push({
 				source: fromNode.uid,
 				name: edgeName,

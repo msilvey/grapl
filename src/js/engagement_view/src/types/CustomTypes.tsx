@@ -1,4 +1,3 @@
-
 export type OtherNodeProperties = {[key: string]: (string | number)};
 export type NodeEdges = {[key: string]: (Node | Node[])};
 

@@ -32,7 +32,6 @@ export const expandLensScopeQuery = (lensName: string) => {
                         risk_score
                     },
                 }
-            
                 ... on Asset {
                     uid, 
                     node_key, 
@@ -62,7 +61,6 @@ export const expandLensScopeQuery = (lensName: string) => {
                         risk_score
                     },
                 }
-
                 ... on File {
                     uid,
                     node_key, 
@@ -75,7 +73,6 @@ export const expandLensScopeQuery = (lensName: string) => {
                         risk_score
                     },
                 }
-
                 ... on PluginType {
                     predicates,
                 }

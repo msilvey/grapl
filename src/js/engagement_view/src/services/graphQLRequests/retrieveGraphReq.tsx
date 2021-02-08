@@ -25,13 +25,7 @@ export const retrieveGraph = async (lens: string): Promise<Lens> => {
 
     const lensWithScopeData = await queryResponse;
     
-    console.debug('LensWithScope: ', lensWithScopeData);
-
     unpackPluginNodes(lensWithScopeData.scope);
 
     return lensWithScopeData;
 };
-
-// const validateLensScopeResponse = (rawResponse: object): LensWithScopeResponse => {
-    
-// }

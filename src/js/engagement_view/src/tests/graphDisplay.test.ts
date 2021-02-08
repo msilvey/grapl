@@ -1,12 +1,10 @@
 import { Lens, VizNode } from "types/CustomTypes";
-import { getNodeType, vizGraphFromLensScope } from "../components/graphDisplay/utils/graph/vizGraphFromLensScope";
+import { getNodeType, vizGraphFromLensScope } from "components/graphDisplay/graphLayout/vizGraphFromLensScope";
 import { baseNodeData } from "./engagementView/data/baseNodeData";
-import {mergeNodes} from "../components/graphDisplay/utils/graph/mergeGraphs";
+import {mergeNodes} from "components/graphDisplay/graphLayout/mergeGraphs";
 
 import {graphVizData, receivedData} from "./engagementView/data/graphVizData";
 import {initialNodeX, initialNodeY} from "./engagementView/data/mergeGraphData";
-
-
 
 // graphQLAdjacencyMatrix
 test("get node type from dGraph type", () => {

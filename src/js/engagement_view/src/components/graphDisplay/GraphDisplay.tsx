@@ -4,6 +4,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { ForceGraph2D } from "react-force-graph";
 import { retrieveGraph } from "../../services/graphQLRequests/retrieveGraphReq";
+import { nodeFillColor, riskOutline } from "./graphVizualization/nodeStyling";
 
 // import { calcLinkColor } from "./utils/graphColoring/coloring.tsx";
 // import { mapLabel } from "./utils/graph/labels.tsx";
@@ -12,8 +13,8 @@ import { retrieveGraph } from "../../services/graphQLRequests/retrieveGraphReq";
 //   calcLinkDirectionalArrowRelPos,
 //   calcLinkParticleWidth,
 // } from "./utils/calculations/link/linkCalcs.tsx";
-import { mergeGraphs } from "./utils/graph/mergeGraphs";
-import { vizGraphFromLensScope } from "./utils/graph/vizGraphFromLensScope";
+import { mergeGraphs } from "./graphLayout/mergeGraphs";
+import { vizGraphFromLensScope } from "./graphLayout/vizGraphFromLensScope";
 import { Link, NodeProperties, VizNode } from "../../types/CustomTypes";
 import {
 	GraphState,
@@ -61,12 +62,13 @@ const updateGraph = async (
 		console.log("No lens names");
 		return;
 	}
-	console.log("engagement state,", engagementState);
-	const curLensName = engagementState.curLensName;
+  const curLensName = engagementState.curLensName;
+  
 	await retrieveGraph(lensName)
 		.then(async (scope) => {
-			const update = vizGraphFromLensScope(scope);
-			console.debug("update", update);
+      // console.log("scope", scope)
+      const update = vizGraphFromLensScope(scope);
+      // console.log("Update", update)
 
 			const mergeUpdate = mergeGraphs(engagementState.graphData, update);
 
@@ -113,51 +115,45 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 	useEffect(() => {
 		const interval = setInterval(async () => {
 			if (lensName) {
-				console.debug("updating graph");
+				// console.debug("updating graph");
 				await updateGraph(lensName, state as GraphState, setState); // state is safe cast, check that lens name is not null
 			}
-		}, 1000);
-		console.debug("setting lensName", lensName);
+		}, 5000);
+		// console.debug("setting lensName", lensName);
 		return () => {
 			clearInterval(interval);
 		};
 	}, [lensName, state, setState]);
 
 	const data = useMemo(() => {
-		const graphData = state.graphData;
+    const graphData = state.graphData;
+    console.log("graphData", graphData)
+    // console.log("graphData", graphData)
 
-		graphData.index = {};
-		graphData.nodes.forEach((node) => (graphData.index[node.uid] = node));
-		graphData.nodes.forEach((node) => (node.neighbors = []));
-		graphData.nodes.forEach((node) => (node.links = []));
+		// graphData.index = {};
+		// graphData.nodes.forEach((node) => (graphData.index[node.uid] = node));
+    // graphData.nodes.forEach((node) => (node.neighbors = []));
+    //   graphData.nodes.forEach((node) => (node.links = []));
 
-		// cross-link node objects
-		graphData.links.forEach((link) => {
-			// console.log("nodes in graph data ", graphData.nodes)
-			// console.log("hardcoded data", graphData.index[50019])
-			// console.log("link", link)
-			// console.log("link.source", link.source)
-
-			const a = graphData.index[link.source];
-			const b = graphData.index[link.target];
-
-			if (a === undefined || b === undefined) {
-				console.error("graphData index", a, b);
-				return;
-			}
-
-			!a.neighbors && (a.neighbors = []);
-			!b.neighbors && (b.neighbors = []);
-
-			a.neighbors.push(b);
-			b.neighbors.push(a);
-
-			!a.links && (a.links = []);
-			!b.links && (b.links = []);
-
-			a.links.push(link);
-			b.links.push(link);
-		});
+		// // cross-link node objects
+		// graphData.links.forEach((link) => {
+    //   const a = graphData.index[link.source];
+    //   const b = graphData.index[link.target];
+    //   console.log("a,b")
+		// 	if (a === undefined || b === undefined) {
+		// 		console.error("graphData index", a, b);
+		// 		return;
+		// 	}
+		// 	!a.neighbors && (a.neighbors = []);
+		// 	!b.neighbors && (b.neighbors = []);
+		// 	a.neighbors.push(b);
+		// 	b.neighbors.push(a);
+		// 	!a.links && (a.links = []);
+		// 	!b.links && (b.links = []);
+		// 	a.links.push(link);
+    //   b.links.push(link);
+      
+		// });
 
 		return graphData;
 	}, [state]);
@@ -176,7 +172,6 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 		highlightNodes.clear();
 		highlightLinks.clear();
 		if (node) {
-			console.log("current node", node);
 			highlightNodes.add(node);
 			node.neighbors?.forEach((neighbor) => highlightNodes.add(neighbor));
 			node.links?.forEach((link) => highlightLinks.add(link));
@@ -199,21 +194,21 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 
 	const nodeStyling = useCallback(
 		(node, ctx, globalScale) => {
-			// add ring to highlight hovered & neighbor nodes
+      // add ring to highlight hovered & neighbor nodes
 			ctx.beginPath();
 			ctx.arc(node.x, node.y, NODE_R * 1.4, 0, 2 * Math.PI, false);
-			ctx.fillStyle = node === hoverNode ? "red" : "purple"; // hovered node || risk score outline
+			ctx.fillStyle = node === hoverNode ? "red" : riskOutline(node.riskScore); // hovered node || risk score outline
 			ctx.fill();
 
 			// Node color
 			ctx.beginPath();
 			ctx.arc(node.x, node.y, NODE_R * 1.2, 0, 2 * Math.PI, false); // risk
-			ctx.fillStyle = node === clickedNode ? "magenta" : "darksalmon";
+			ctx.fillStyle = node === clickedNode ? "magenta" :  nodeFillColor(node.dgraph_type[0]);
 			ctx.fill();
 			ctx.restore();
 
 			// label
-			const label = node.id;
+			const label = node.nodeLabel;
 			const fontSize = 12 / globalScale;
 			ctx.font = `${fontSize}px Sans-Serif`;
 			const textWidth = ctx.measureText(label).width;
@@ -240,16 +235,16 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 		<ForceGraph2D
 			graphData={data}
 			nodeRelSize={NODE_R}
-			nodeLabel={"id"}
+			nodeLabel={"nodeLabel"} // tooltip on hover, actual label is in nodeCanvasObject
 			nodeColor={(node) => "rgba(255, 255, 255, .15)"}
 			onNodeClick={(_node, ctx) => {
 				const node = _node as VizNode;
-
 				node.fx = undefined;
 				node.fy = undefined;
 
+        setCurNode(node);
 				setHoverNode(node || null);
-				setClickedNode(node || null);
+        setClickedNode(node || null);
 			}}
 			onNodeDragEnd={(node) => {
 				node.fx = node.x;
@@ -268,20 +263,20 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 				highlightNodes.has(node) ? "before" : "after"
 			}
 			nodeCanvasObject={nodeStyling}
-			onNodeHover={(_node) => {
-				if (!_node) {
-					return;
-				}
-				const node = _node as VizNode;
-				handleNodeHover(node);
-			}}
-			onLinkHover={(_link) => {
-				if (!_link) {
-					return;
-				}
-				const link = _link as Link;
-				handleLinkHover(link);
-			}}
+			// onNodeHover={(_node) => {
+			// 	if (!_node) {
+			// 		return;
+			// 	}
+			// 	const node = _node as VizNode;
+			// 	handleNodeHover(node);
+			// }}
+			// onLinkHover={(_link) => {
+			// 	if (!_link) {
+			// 		return;
+			// 	}
+			// 	const link = _link as Link;
+			// 	handleLinkHover(link);
+			// }}
 		/>
 	);
 };

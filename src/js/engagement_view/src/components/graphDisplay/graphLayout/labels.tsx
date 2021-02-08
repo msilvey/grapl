@@ -1,4 +1,4 @@
-import { NodeProperties }  from '../../../../types/CustomTypes'
+import { NodeProperties }  from '../../../types/CustomTypes'
 
 const getNodeLabel = (nodeType: string, node: NodeProperties) => {
     const _node = node; 
