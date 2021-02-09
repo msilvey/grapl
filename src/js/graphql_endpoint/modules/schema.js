@@ -299,16 +299,15 @@ const getLenses = async (dg_client, first, offset) => {
         }
     }`;
 
-	console.log("creating DGraph txn in getLenses");
+	console.log("Creating DGraph txn in getLenses");
 	const txn = dg_client.newTxn();
 
 	try {
-		console.log("Querying DGraph for: getLenses");
+		console.log("Querying DGraph forgetLenses");
 		const res = await txn.queryWithVars(query, {
 			$a: first.toString(),
 			$b: offset.toString(),
 		});
-		console.log("lens res from DGraph", res);
 		return res.getJson()["all"];
 	} catch (e) {
 		console.error("Error in DGraph txn getLenses: ", e);

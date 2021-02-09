@@ -1,9 +1,5 @@
-// NOTE: Not using ts-check in this filet to support plugins. We won't always have the same.
-// type because we don't know what the data looks like. To avoid littering the codebase ":any", we're using no-check
-
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { ForceGraph2D } from "react-force-graph";
-import { retrieveGraph } from "../../services/graphQLRequests/retrieveGraphReq";
 import { nodeFillColor, riskOutline } from "./graphVizualization/nodeStyling";
 
 // import { calcLinkColor } from "./utils/graphColoring/coloring.tsx";
@@ -13,8 +9,8 @@ import { nodeFillColor, riskOutline } from "./graphVizualization/nodeStyling";
 //   calcLinkDirectionalArrowRelPos,
 //   calcLinkParticleWidth,
 // } from "./utils/calculations/link/linkCalcs.tsx";
-import { mergeGraphs } from "./graphLayout/mergeGraphs";
-import { vizGraphFromLensScope } from "./graphLayout/vizGraphFromLensScope";
+
+import {updateGraph} from "./graphUpdates/updateGraph"
 import { Link, NodeProperties, VizNode } from "../../types/CustomTypes";
 import {
 	GraphState,
@@ -53,50 +49,6 @@ const defaultClickedState = (): ClickedNodeState => {
 	return null;
 };
 
-const updateGraph = async (
-	lensName: string,
-	engagementState: GraphState,
-	setEngagementState: (engagementState: GraphState) => void
-) => {
-	if (!lensName) {
-		console.log("No lens names");
-		return;
-	}
-  const curLensName = engagementState.curLensName;
-  
-	await retrieveGraph(lensName)
-		.then(async (scope) => {
-      // console.log("scope", scope)
-      const update = vizGraphFromLensScope(scope);
-      // console.log("Update", update)
-
-			const mergeUpdate = mergeGraphs(engagementState.graphData, update);
-
-			if (mergeUpdate !== null) {
-				if (curLensName === lensName) {
-					setEngagementState({
-						...engagementState,
-						curLensName: lensName,
-						graphData: mergeUpdate,
-					});
-				} else {
-					console.log(
-						"Switched lens, updating graph",
-						engagementState.curLensName,
-						"ln",
-						lensName
-					);
-					setEngagementState({
-						...engagementState,
-						curLensName: lensName,
-						graphData: update,
-					});
-				}
-			}
-		})
-		.catch((e) => console.error("Failed to retrieveGraph ", e));
-};
-
 const NODE_R = 8;
 
 // get gData using GraplData
@@ -126,20 +78,20 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 	}, [lensName, state, setState]);
 
 	const data = useMemo(() => {
-    const graphData = state.graphData;
-    console.log("graphData", graphData)
-    // console.log("graphData", graphData)
+		const graphData = state.graphData;
+		console.log("graphData", graphData);
+		// console.log("graphData", graphData)
 
 		// graphData.index = {};
 		// graphData.nodes.forEach((node) => (graphData.index[node.uid] = node));
-    // graphData.nodes.forEach((node) => (node.neighbors = []));
-    //   graphData.nodes.forEach((node) => (node.links = []));
+		// graphData.nodes.forEach((node) => (node.neighbors = []));
+		//   graphData.nodes.forEach((node) => (node.links = []));
 
 		// // cross-link node objects
 		// graphData.links.forEach((link) => {
-    //   const a = graphData.index[link.source];
-    //   const b = graphData.index[link.target];
-    //   console.log("a,b")
+		//   const a = graphData.index[link.source];
+		//   const b = graphData.index[link.target];
+		//   console.log("a,b")
 		// 	if (a === undefined || b === undefined) {
 		// 		console.error("graphData index", a, b);
 		// 		return;
@@ -151,8 +103,8 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 		// 	!a.links && (a.links = []);
 		// 	!b.links && (b.links = []);
 		// 	a.links.push(link);
-    //   b.links.push(link);
-      
+		//   b.links.push(link);
+
 		// });
 
 		return graphData;
@@ -194,7 +146,7 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 
 	const nodeStyling = useCallback(
 		(node, ctx, globalScale) => {
-      // add ring to highlight hovered & neighbor nodes
+			// add ring to highlight hovered & neighbor nodes
 			ctx.beginPath();
 			ctx.arc(node.x, node.y, NODE_R * 1.4, 0, 2 * Math.PI, false);
 			ctx.fillStyle = node === hoverNode ? "red" : riskOutline(node.riskScore); // hovered node || risk score outline
@@ -203,7 +155,8 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			// Node color
 			ctx.beginPath();
 			ctx.arc(node.x, node.y, NODE_R * 1.2, 0, 2 * Math.PI, false); // risk
-			ctx.fillStyle = node === clickedNode ? "magenta" :  nodeFillColor(node.dgraph_type[0]);
+			ctx.fillStyle =
+				node === clickedNode ? "magenta" : nodeFillColor(node.dgraph_type[0]);
 			ctx.fill();
 			ctx.restore();
 
@@ -242,9 +195,9 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 				node.fx = undefined;
 				node.fy = undefined;
 
-        setCurNode(node);
+				setCurNode(node);
 				setHoverNode(node || null);
-        setClickedNode(node || null);
+				setClickedNode(node || null);
 			}}
 			onNodeDragEnd={(node) => {
 				node.fx = node.x;
