@@ -4,6 +4,10 @@ export const useStyles = makeStyles({
     root:{
         fontSize: "1rem",
     },
+    backdrop: {
+        zIndex: 1, 
+        color: "#fff"
+    }, 
     button: {
         width: ".005%",
         color: "white",

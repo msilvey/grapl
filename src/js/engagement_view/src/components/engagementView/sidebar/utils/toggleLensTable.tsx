@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import Button from "@material-ui/core/Button";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Divider from "@material-ui/core/Divider";
+import Backdrop from "@material-ui/core/Backdrop";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 import { lensTable } from "./lensTable";
 import { getLenses } from "services/graphQLRequests/getLenses";
@@ -21,36 +23,44 @@ const defaultToggleLensTableState = (): ToggleLensTableState => {
 };
 
 export function ToggleLensTable({ setLens }: ToggleLensTableProps) {
-	const [state, setState] = useState(defaultToggleLensTableState());
 	const classes = useStyles();
 
-	const [page, setPage] = useState(0);
-	const [rowsPerPage, setRowsPerPage] = useState(10);
+	const [lensRetrievedState, setLensRetrievedState] = useState(null);
+	const [toggleTableState, setToggleTableState] = useState(
+		defaultToggleLensTableState()
+	);
+	const [pageState, setPageState] = useState(0);
+	const [rowsPerPageState, setRowsPerPageState] = useState(10);
+
 	const handleChangePage = (
 		event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null,
 		page: number
 	) => {
-		setPage(page);
+		setPageState(page);
 	};
+
 	const handleChangeRowsPerPage = (
 		event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
 	) => {
-		setRowsPerPage(parseInt(event.target.value, 10));
-		setPage(0);
+		setRowsPerPageState(parseInt(event.target.value, 10));
+		setPageState(0);
 	};
 
 	useEffect(() => {
 		const interval = setInterval(() => {
-			getLenses(state.first, state.offset).then((response) => {
-				if (response.lenses && response.lenses !== state.lenses) {
-					const lenses = state.lenses.concat(response.lenses);
-					setState({
-						...state,
-						offset: state.offset + response.lenses.length || 0,
-						lenses,
-					});
+			getLenses(toggleTableState.first, toggleTableState.offset).then(
+				(response) => {
+					if (response.lenses && response.lenses !== toggleTableState.lenses) {
+						const lenses = toggleTableState.lenses.concat(response.lenses);
+						setLensRetrievedState(lenses as any);
+						setToggleTableState({
+							...toggleTableState,
+							offset: toggleTableState.offset + response.lenses.length || 0,
+							lenses,
+						});
+					}
 				}
-			});
+			);
 		}, 5000);
 		return () => clearInterval(interval);
 	});
@@ -62,9 +72,9 @@ export function ToggleLensTable({ setLens }: ToggleLensTableProps) {
 				<Button
 					className={classes.button}
 					onClick={() => {
-						setState({
-							...state,
-							toggled: !state.toggled,
+						setToggleTableState({
+							...toggleTableState,
+							toggled: !toggleTableState.toggled,
 						});
 					}}
 				>
@@ -73,16 +83,23 @@ export function ToggleLensTable({ setLens }: ToggleLensTableProps) {
 			</div>
 
 			<div className="lensToggle">
-				{state.toggled &&
+				{/* {lensRetrievedState ? : "Retrieving Lenses..."} */}
+				{lensRetrievedState ? (
+					toggleTableState.toggled &&
 					lensTable(
-						state,
-						page,
-						rowsPerPage,
+						toggleTableState,
+						pageState,
+						rowsPerPageState,
 						handleChangePage,
 						handleChangeRowsPerPage,
 						setLens,
 						classes
-					)}
+					)
+				) : (
+					<Backdrop className={classes.backdrop} open>
+						<CircularProgress color="inherit" />
+					</Backdrop>
+				)}
 			</div>
 
 			<Divider />

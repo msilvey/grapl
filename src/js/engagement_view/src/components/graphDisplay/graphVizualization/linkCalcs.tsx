@@ -19,8 +19,8 @@ export const calcLinkRisk = (link: Link, Graph: VizGraph) => {
 			findNode(link.target as any, Graph.nodes) ||
 			findNode((link as any).target.name as any, Graph.nodes);
 
-	const srcRisk: number = (sourceNode.risk_score) || 0;
-	const dstRisk: number = (targetNode.risk_score) || 0;
+	const sourceRisk: number = (sourceNode.risk_score) || 0;
+	const targetRisk: number = (targetNode.risk_score) || 0;
 
 	if (!sourceNode || !targetNode) {
 		console.error(
@@ -32,23 +32,25 @@ export const calcLinkRisk = (link: Link, Graph: VizGraph) => {
 		);
 		return 0;
 	}
-	return Math.round((srcRisk + dstRisk) / 2);
+	return Math.round((sourceRisk + targetRisk) / 2);
 };
 
-export const calcLinkRiskPercentile = (link: Link, Graph: VizGraph) => {
-	const linkRisk = calcLinkRisk(link, Graph);
-	const nodes = [...Graph.nodes].map((node) => node.risk);
+export const calcLinkRiskPercentile = (link: Link, graph: VizGraph) => {
+	console.log("Link", link);
+	console.log("Graph", graph)
+	const linkRisk = calcLinkRisk(link, graph);
+	const nodes = [...graph.nodes].map((node) => node.risk);
 
 	return calcNodeRiskPercentile(linkRisk, nodes);
 };
 
-export const calcLinkColor = (link: Link, Graph: VizGraph): string => {	
-    const risk = calcLinkRiskPercentile(link, Graph);
+export const calcLinkColor = (link: Link, graph: VizGraph): string => {	
+    const risk = calcLinkRiskPercentile(link, graph);
 	return riskOutline(risk) as string;   
 };
 	
-export const calcLinkParticleWidth = (link: Link, Graph: VizGraph): number => {
-	const linkRiskPercentile = calcLinkRiskPercentile(link, Graph);
+export const calcLinkParticleWidth = (link: Link, graph: VizGraph): number => {
+	const linkRiskPercentile = calcLinkRiskPercentile(link, graph);
 	if (linkRiskPercentile >= 75) {
 		return 5;
 	} else if (linkRiskPercentile >= 50) {

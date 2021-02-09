@@ -1,6 +1,4 @@
 export const expandLensScopeQuery = (lensName: string) => {
-    console.log("expanding scope for: ", lensName);
-
     const query = `
     {
         lens_scope(lens_name: "${lensName}") {

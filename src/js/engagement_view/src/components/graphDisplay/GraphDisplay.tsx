@@ -12,6 +12,7 @@ import {
 	calcLinkColor,
 } from "./graphVizualization/linkCalcs";
 
+
 // import { calcLinkColor } from "./utils/graphColoring/coloring.tsx";
 // import { mapLabel } from "./utils/graph/labels.tsx";
 // import { nodeRisk } from "./utils/calculations/node/nodeCalcs.tsx";
@@ -182,8 +183,8 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			nodeColor={(node) => "rgba(255, 255, 255, .15)"}
 			onNodeClick={(_node, ctx) => {
 				const node = _node as VizNode;
-				node.fx = undefined;
-				node.fy = undefined;
+				// node.fx = undefined;
+				// node.fy = undefined;
 
 				setCurNode(node);
 				setHoverNode(node || null);
