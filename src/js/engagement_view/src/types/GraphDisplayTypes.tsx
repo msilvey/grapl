@@ -7,7 +7,7 @@ export type GraphDisplayProps = {
 
 export type GraphDisplayState = {
     graphData: VizGraph,
-    curLensName: string | null,
+    curLensName: string | null, 
 }
 
 export type GraphState = {

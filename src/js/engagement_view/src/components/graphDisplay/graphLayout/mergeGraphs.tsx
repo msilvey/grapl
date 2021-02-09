@@ -1,4 +1,4 @@
-import { mapNodeProps } from "../GraphDisplay";
+import { mapNodeProps } from "./mapNodeProps";
 import { VizGraph, VizNode } from "../../../types/CustomTypes";
 
 // if graph has updated, merge y into x

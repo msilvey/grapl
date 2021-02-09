@@ -1,6 +1,16 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, {
+	useEffect,
+	useState,
+	useMemo,
+	useCallback,
+	useRef,
+} from "react";
 import { ForceGraph2D } from "react-force-graph";
 import { nodeFillColor, riskOutline } from "./graphVizualization/nodeStyling";
+import {
+	calcLinkParticleWidth,
+	calcLinkColor,
+} from "./graphVizualization/linkCalcs";
 
 // import { calcLinkColor } from "./utils/graphColoring/coloring.tsx";
 // import { mapLabel } from "./utils/graph/labels.tsx";
@@ -10,48 +20,19 @@ import { nodeFillColor, riskOutline } from "./graphVizualization/nodeStyling";
 //   calcLinkParticleWidth,
 // } from "./utils/calculations/link/linkCalcs.tsx";
 
-import {updateGraph} from "./graphUpdates/updateGraph"
-import { Link, NodeProperties, VizNode } from "../../types/CustomTypes";
+import { updateGraph } from "./graphUpdates/updateGraph";
+import { Link, VizNode, VizGraph } from "../../types/CustomTypes";
 import {
 	GraphState,
 	GraphDisplayState,
 	GraphDisplayProps,
 } from "../../types/GraphDisplayTypes";
 
-export const mapNodeProps = (
-	node: NodeProperties,
-	f: (propName: string) => void
-) => {
-	for (const prop in node) {
-		const nodeProp = node[prop];
-
-		if (Object.prototype.hasOwnProperty.call(node, prop)) {
-			if (Array.isArray(nodeProp)) {
-				if (nodeProp.length > 0) {
-					if (nodeProp[0].uid === undefined) {
-						f(prop);
-					}
-				}
-			} else {
-				f(prop);
-			}
-		}
-	}
-};
-
 type HoverState = VizNode | null;
 type ClickedNodeState = VizNode | null;
 
-const defaultHoverState = (): HoverState => {
-	return null;
-};
-const defaultClickedState = (): ClickedNodeState => {
-	return null;
-};
-
 const NODE_R = 8;
 
-// get gData using GraplData
 const defaultGraphDisplayState = (
 	lensName: string | null
 ): GraphDisplayState => {
@@ -61,17 +42,22 @@ const defaultGraphDisplayState = (
 	};
 };
 
-const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
-	const [state, setState] = React.useState(defaultGraphDisplayState(lensName));
+const defaultHoverState = (): HoverState => {
+	return null;
+};
+const defaultClickedState = (): ClickedNodeState => {
+	return null;
+};
 
+const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
+	const fgRef: any = useRef(); // fix graph to canvas
+	const [state, setState] = React.useState(defaultGraphDisplayState(lensName));
 	useEffect(() => {
 		const interval = setInterval(async () => {
 			if (lensName) {
-				// console.debug("updating graph");
 				await updateGraph(lensName, state as GraphState, setState); // state is safe cast, check that lens name is not null
 			}
 		}, 5000);
-		// console.debug("setting lensName", lensName);
 		return () => {
 			clearInterval(interval);
 		};
@@ -146,8 +132,11 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 
 	const nodeStyling = useCallback(
 		(node, ctx, globalScale) => {
-			// add ring to highlight hovered & neighbor nodes
-			ctx.beginPath();
+			node.fx = node.x;
+			node.fy = node.y;
+			// console.log("FX", node.fx, node.x)
+
+			ctx.beginPath(); // add ring to highlight hovered & neighbor nodes
 			ctx.arc(node.x, node.y, NODE_R * 1.4, 0, 2 * Math.PI, false);
 			ctx.fillStyle = node === hoverNode ? "red" : riskOutline(node.riskScore); // hovered node || risk score outline
 			ctx.fill();
@@ -187,6 +176,7 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 	return (
 		<ForceGraph2D
 			graphData={data}
+			ref={fgRef}
 			nodeRelSize={NODE_R}
 			nodeLabel={"nodeLabel"} // tooltip on hover, actual label is in nodeCanvasObject
 			nodeColor={(node) => "rgba(255, 255, 255, .15)"}
@@ -203,19 +193,26 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 				node.fx = node.x;
 				node.fy = node.y;
 			}}
-			linkColor={(link) => (highlightLinks.has(link) ? "aliceblue" : "#c0c0c0")}
-			linkWidth={(link) => (highlightLinks.has(link) ? 8 : 3)}
-			linkDirectionalParticleColor={(link) => "cyan"}
-			linkDirectionalArrowLength={8.5}
+			linkColor={(link) =>
+				highlightLinks.has(link)
+					? "aliceblue"
+					: calcLinkColor(link as Link, data as VizGraph)
+			}
+			linkWidth={(link) => (highlightLinks.has(link) ? 10 : 7)}
+			linkDirectionalParticleColor={(link) => "red"}
+			linkDirectionalArrowLength={10}
 			linkDirectionalArrowRelPos={1}
-			linkDirectionalParticles={3}
+			linkDirectionalParticles={1}
 			linkDirectionalParticleWidth={(link) =>
-				highlightLinks.has(link) ? 9 : 0
+				highlightLinks.has(link)
+					? calcLinkParticleWidth(link as Link, data as VizGraph) + 2
+					: calcLinkParticleWidth(link as Link, data as VizGraph) + 1
 			}
 			nodeCanvasObjectMode={(node) =>
 				highlightNodes.has(node) ? "before" : "after"
 			}
 			nodeCanvasObject={nodeStyling}
+			cooldownTicks={100}
 			// onNodeHover={(_node) => {
 			// 	if (!_node) {
 			// 		return;
