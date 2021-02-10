@@ -94,7 +94,7 @@ export const vizGraphFromLensScope = (vizGraphData: Lens): VizGraph => {
 			// x: 200 + randomInt(1, 5),
 			// y: 150 + randomInt(1, 5), // #TODO: might need to add these back, coordinates to add new nodes
 			...strippedNode,
-			riskScore,
+			risk_score: riskScore,
 			analyzerNames,
 			id: node.uid,
 			nodeType,

@@ -13,11 +13,11 @@ const getNodeLabel = (nodeType: string, node: NodeProperties) => {
     }
 };
 
-const mapLabel = (label: string) => {
-    if (label === 'children') {
+const mapLabel = (labelType: string) => {
+    if (labelType === 'children') {
         return 'executed'
     }
-    return label
+    return labelType;
 };
 
 export { mapLabel, getNodeLabel }

@@ -83,7 +83,6 @@ export function ToggleLensTable({ setLens }: ToggleLensTableProps) {
 			</div>
 
 			<div className="lensToggle">
-				{/* {lensRetrievedState ? : "Retrieving Lenses..."} */}
 				{lensRetrievedState ? (
 					toggleTableState.toggled &&
 					lensTable(

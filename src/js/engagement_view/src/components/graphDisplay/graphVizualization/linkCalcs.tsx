@@ -36,8 +36,6 @@ export const calcLinkRisk = (link: Link, Graph: VizGraph) => {
 };
 
 export const calcLinkRiskPercentile = (link: Link, graph: VizGraph) => {
-	console.log("Link", link);
-	console.log("Graph", graph)
 	const linkRisk = calcLinkRisk(link, graph);
 	const nodes = [...graph.nodes].map((node) => node.risk);
 

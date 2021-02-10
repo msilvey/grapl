@@ -12,7 +12,6 @@ import {
 	calcLinkColor,
 } from "./graphVizualization/linkCalcs";
 
-
 // import { calcLinkColor } from "./utils/graphColoring/coloring.tsx";
 // import { mapLabel } from "./utils/graph/labels.tsx";
 // import { nodeRisk } from "./utils/calculations/node/nodeCalcs.tsx";
@@ -20,7 +19,7 @@ import {
 //   calcLinkDirectionalArrowRelPos,
 //   calcLinkParticleWidth,
 // } from "./utils/calculations/link/linkCalcs.tsx";
-
+import { mapLabel } from "./graphLayout/labels";
 import { updateGraph } from "./graphUpdates/updateGraph";
 import { Link, VizNode, VizGraph } from "../../types/CustomTypes";
 import {
@@ -153,7 +152,9 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			// label
 			const label = node.nodeLabel;
 			const fontSize = 12 / globalScale;
+
 			ctx.font = `${fontSize}px Sans-Serif`;
+
 			const textWidth = ctx.measureText(label).width;
 			const bckgDimensions = [textWidth, fontSize].map(
 				(n) => n + fontSize * 0.2
@@ -174,6 +175,64 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 		[hoverNode, clickedNode]
 	);
 
+	// const linkStyling = useCallback((link: Link) => {
+
+	// }, [])
+
+	const linkStyling = ((link: any, ctx: any) => {
+		const MAX_FONT_SIZE = 8;
+		const LABEL_NODE_MARGIN = 8 * 1.5;
+
+		const start = link.source;
+		const end = link.target;
+
+		// ignore unbound links
+		link.color = calcLinkColor(link, data);
+
+		if (typeof start !== 'object' || typeof end !== 'object') return;
+		// calculate label positioning
+	
+
+		const textPos = {
+			x: (start.x + (end.x - start.x) / 2) ,
+			y: (start.y + (end.y - start.y) / 2)
+		};
+
+		const relLink = {x: end.x - start.x, y: end.y - start.y};
+
+		const maxTextLength = Math.sqrt(Math.pow(relLink.x, 2) + Math.pow(relLink.y, 2)) - LABEL_NODE_MARGIN * 8;
+
+		let textAngle = Math.atan2(relLink.y, relLink.x);
+		// maintain label vertical orientation for legibility
+		if (textAngle > Math.PI / 2) textAngle = -(Math.PI - textAngle);
+		if (textAngle < -Math.PI / 2) textAngle = -(-Math.PI - textAngle);
+
+		
+		const label = mapLabel(link.name);
+		// estimate fontSize to fit in link length
+		ctx.font = '50px Roboto';
+		const fontSize = Math.min(MAX_FONT_SIZE, maxTextLength / ctx.measureText(label).width);
+		ctx.font = `${fontSize + 5}px Roboto`;
+
+		let textWidth = ctx.measureText(label).width;
+
+		textWidth += Math.round(textWidth * 0.25);
+
+		const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); // some padding
+		// draw text label (with background rect)
+		ctx.save();
+		ctx.translate(textPos.x, textPos.y);
+		ctx.rotate(textAngle);
+		// ctx.fillStyle = 'rgb(115,222,255,1)';
+		ctx.fillRect(-bckgDimensions[0] / 2, -bckgDimensions[1] / 2, ...bckgDimensions);
+		ctx.textAlign = 'center';
+		ctx.textBaseline = 'middle';
+		// ctx.fillStyle = 'white';
+		//content, left/right, top/bottom
+		ctx.fillText(label, .75, 3);
+		ctx.restore();
+	})
+
 	return (
 		<ForceGraph2D
 			graphData={data}
@@ -183,8 +242,8 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			nodeColor={(node) => "rgba(255, 255, 255, .15)"}
 			onNodeClick={(_node, ctx) => {
 				const node = _node as VizNode;
-				// node.fx = undefined;
-				// node.fy = undefined;
+				node.fx = undefined;
+				node.fy = undefined;
 
 				setCurNode(node);
 				setHoverNode(node || null);
@@ -213,6 +272,9 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 				highlightNodes.has(node) ? "before" : "after"
 			}
 			nodeCanvasObject={nodeStyling}
+			linkCanvasObjectMode={(() => 'after')}
+			linkCanvasObject={linkStyling}
+			warmupTicks={100}
 			cooldownTicks={100}
 			// onNodeHover={(_node) => {
 			// 	if (!_node) {
