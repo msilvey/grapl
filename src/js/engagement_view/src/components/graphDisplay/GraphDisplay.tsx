@@ -134,7 +134,6 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 		(node, ctx, globalScale) => {
 			node.fx = node.x;
 			node.fy = node.y;
-			// console.log("FX", node.fx, node.x)
 
 			ctx.beginPath(); // add ring to highlight hovered & neighbor nodes
 			ctx.arc(node.x, node.y, NODE_R * 1.4, 0, 2 * Math.PI, false);
@@ -149,22 +148,24 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			ctx.fill();
 			ctx.restore();
 
-			// label
 			const label = node.nodeLabel;
-			const fontSize = 12 / globalScale;
-
-			ctx.font = `${fontSize}px Sans-Serif`;
+			ctx.font = '50px Roboto';
+			const fontSize = Math.min(98, NODE_R / ctx.measureText(label).width);
+			ctx.font = `${fontSize + 5}px Roboto`;
 
 			const textWidth = ctx.measureText(label).width;
-			const bckgDimensions = [textWidth, fontSize].map(
+
+			const labelBkgdDimensions = [textWidth, fontSize].map(
 				(n) => n + fontSize * 0.2
 			);
 
 			ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+			
 			ctx.fillRect(
-				node.x - bckgDimensions[0] / 2,
-				node.y - bckgDimensions[1] / 2,
-				...bckgDimensions
+				node.x - labelBkgdDimensions[0] / 2, // rectangle x coordinate
+				node.y - labelBkgdDimensions[1] - 2.75, // rectangle y coordinate
+				labelBkgdDimensions[0] + 1.25 , // rectangle width 
+				labelBkgdDimensions[1] + 5.5, // rectangle height
 			);
 
 			ctx.textAlign = "center";
@@ -175,10 +176,6 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 		[hoverNode, clickedNode]
 	);
 
-	// const linkStyling = useCallback((link: Link) => {
-
-	// }, [])
-
 	const linkStyling = ((link: any, ctx: any) => {
 		const MAX_FONT_SIZE = 8;
 		const LABEL_NODE_MARGIN = 8 * 1.5;
@@ -186,50 +183,43 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 		const start = link.source;
 		const end = link.target;
 
-		// ignore unbound links
 		link.color = calcLinkColor(link, data);
 
+		// ignore unbounded links
 		if (typeof start !== 'object' || typeof end !== 'object') return;
-		// calculate label positioning
-	
 
+		// Edge label positioning calculations
 		const textPos = {
 			x: (start.x + (end.x - start.x) / 2) ,
 			y: (start.y + (end.y - start.y) / 2)
 		};
 
 		const relLink = {x: end.x - start.x, y: end.y - start.y};
-
 		const maxTextLength = Math.sqrt(Math.pow(relLink.x, 2) + Math.pow(relLink.y, 2)) - LABEL_NODE_MARGIN * 8;
 
 		let textAngle = Math.atan2(relLink.y, relLink.x);
-		// maintain label vertical orientation for legibility
+
+		// Maintain label vertical orientation for legibility
 		if (textAngle > Math.PI / 2) textAngle = -(Math.PI - textAngle);
 		if (textAngle < -Math.PI / 2) textAngle = -(-Math.PI - textAngle);
 
-		
 		const label = mapLabel(link.name);
-		// estimate fontSize to fit in link length
+
+		// Estimate fontSize to fit in link length
 		ctx.font = '50px Roboto';
 		const fontSize = Math.min(MAX_FONT_SIZE, maxTextLength / ctx.measureText(label).width);
 		ctx.font = `${fontSize + 5}px Roboto`;
 
 		let textWidth = ctx.measureText(label).width;
-
 		textWidth += Math.round(textWidth * 0.25);
 
-		const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); // some padding
-		// draw text label (with background rect)
+		// Draw text label
 		ctx.save();
 		ctx.translate(textPos.x, textPos.y);
 		ctx.rotate(textAngle);
-		// ctx.fillStyle = 'rgb(115,222,255,1)';
-		ctx.fillRect(-bckgDimensions[0] / 2, -bckgDimensions[1] / 2, ...bckgDimensions);
 		ctx.textAlign = 'center';
-		ctx.textBaseline = 'middle';
-		// ctx.fillStyle = 'white';
-		//content, left/right, top/bottom
-		ctx.fillText(label, .75, 3);
+		ctx.textBaseline = 'middle';	
+		ctx.fillText(label, .75, 3); //Content, left/right, top/bottom
 		ctx.restore();
 	})
 
