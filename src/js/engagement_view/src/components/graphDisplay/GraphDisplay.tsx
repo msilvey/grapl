@@ -232,9 +232,6 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			nodeColor={(node) => "rgba(255, 255, 255, .15)"}
 			onNodeClick={(_node, ctx) => {
 				const node = _node as VizNode;
-				node.fx = undefined;
-				node.fy = undefined;
-
 				setCurNode(node);
 				setHoverNode(node || null);
 				setClickedNode(node || null);
