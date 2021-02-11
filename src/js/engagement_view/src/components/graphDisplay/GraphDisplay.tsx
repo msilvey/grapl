@@ -12,8 +12,7 @@ import {
 	calcLinkColor,
 } from "./graphVizualization/linkCalcs";
 
-// import { calcLinkColor } from "./utils/graphColoring/coloring.tsx";
-// import { mapLabel } from "./utils/graph/labels.tsx";
+
 // import { nodeRisk } from "./utils/calculations/node/nodeCalcs.tsx";
 // import {
 //   calcLinkDirectionalArrowRelPos,
@@ -137,14 +136,14 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 
 			ctx.beginPath(); // add ring to highlight hovered & neighbor nodes
 			ctx.arc(node.x, node.y, NODE_R * 1.4, 0, 2 * Math.PI, false);
-			ctx.fillStyle = node === hoverNode ? "red" : riskOutline(node.riskScore); // hovered node || risk score outline
+			ctx.fillStyle = node === hoverNode ? "red" : riskOutline(node.risk_score); // hovered node || risk score outline
 			ctx.fill();
 
 			// Node color
 			ctx.beginPath();
 			ctx.arc(node.x, node.y, NODE_R * 1.2, 0, 2 * Math.PI, false); // risk
 			ctx.fillStyle =
-				node === clickedNode ? "magenta" : nodeFillColor(node.dgraph_type[0]);
+				node === clickedNode ? "#DEFF00" : nodeFillColor(node.dgraph_type[0]);
 			ctx.fill();
 			ctx.restore();
 
@@ -170,7 +169,7 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 
 			ctx.textAlign = "center";
 			ctx.textBaseline = "middle";
-			ctx.fillStyle = "white";
+			ctx.fillStyle = "#ffffff";
 			ctx.fillText(label, node.x, node.y);
 		},
 		[hoverNode, clickedNode]
@@ -209,7 +208,6 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 		ctx.font = '50px Roboto';
 		const fontSize = Math.min(MAX_FONT_SIZE, maxTextLength / ctx.measureText(label).width);
 		ctx.font = `${fontSize + 5}px Roboto`;
-
 		let textWidth = ctx.measureText(label).width;
 		textWidth += Math.round(textWidth * 0.25);
 
@@ -230,6 +228,10 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			nodeRelSize={NODE_R}
 			nodeLabel={"nodeLabel"} // tooltip on hover, actual label is in nodeCanvasObject
 			nodeColor={(node) => "rgba(255, 255, 255, .15)"}
+			nodeCanvasObjectMode={(node) =>
+				highlightNodes.has(node) ? "before" : "after"
+			}
+			nodeCanvasObject={nodeStyling}
 			onNodeClick={(_node, ctx) => {
 				const node = _node as VizNode;
 				setCurNode(node);
@@ -245,20 +247,17 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 					? "aliceblue"
 					: calcLinkColor(link as Link, data as VizGraph)
 			}
-			linkWidth={(link) => (highlightLinks.has(link) ? 10 : 7)}
-			linkDirectionalParticleColor={(link) => "red"}
+			linkWidth={(link) => (highlightLinks.has(link) ? 10 : 7)}	
 			linkDirectionalArrowLength={10}
 			linkDirectionalArrowRelPos={1}
+			linkDirectionalParticleSpeed={0.005}
+			linkDirectionalParticleColor={(link) => "#919191"}
 			linkDirectionalParticles={1}
 			linkDirectionalParticleWidth={(link) =>
 				highlightLinks.has(link)
 					? calcLinkParticleWidth(link as Link, data as VizGraph) + 2
 					: calcLinkParticleWidth(link as Link, data as VizGraph) + 1
 			}
-			nodeCanvasObjectMode={(node) =>
-				highlightNodes.has(node) ? "before" : "after"
-			}
-			nodeCanvasObject={nodeStyling}
 			linkCanvasObjectMode={(() => 'after')}
 			linkCanvasObject={linkStyling}
 			warmupTicks={100}

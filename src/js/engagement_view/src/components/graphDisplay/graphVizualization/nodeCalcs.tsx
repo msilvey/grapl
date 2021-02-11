@@ -28,15 +28,17 @@ export const calcNodeRiskPercentile = (
 
 export const nodeRisk = (node: VizNode, Graph: VizGraph) => {
 	const nodes = [...Graph.nodes].map((node) => node.risk);
-	// const riskPercentile = calcNodeRiskPercentile(node.risk_score, nodes);
+	const _node = node as any; 
+	
+	const riskPercentile = calcNodeRiskPercentile(_node.risk_score, nodes);
 
-	// if (riskPercentile >= 75) {
-	// 	return 6;
-	// } else if (riskPercentile >= 50) {
-	// 	return 5;
-	// } else if (riskPercentile >= 25) {
-	// 	return 4;
-	// } else {
-	// 	return 3;
-	// }
+	if (riskPercentile >= 75) {
+		return 6;
+	} else if (riskPercentile >= 50) {
+		return 5;
+	} else if (riskPercentile >= 25) {
+		return 4;
+	} else {
+		return 3;
+	}
 };
