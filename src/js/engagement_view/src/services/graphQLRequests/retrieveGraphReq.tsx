@@ -5,7 +5,7 @@ import {expandLensScopeQuery} from './utils_retrieveGraph/expandLensScopeQuery';
 import DEV_API_EDGES from '../constants';
 import {apiFetchWithBody} from '../fetch';
 
-export const retrieveGraph = async (lens: string): Promise<Lens> => {
+export const retrieveGraph = async (lens: string): Promise<Node[]> => {
     const expandScopeQueryData = expandLensScopeQuery(lens);
     
     const lensScopeQuery = JSON.stringify({ query: expandScopeQueryData })
@@ -21,11 +21,11 @@ export const retrieveGraph = async (lens: string): Promise<Lens> => {
                 return res
             })
             .then((res) => res.data)
-            .then((res) => res.lens_scope);
+            .then((res) => res.lens_scope.scope);
 
     const lensWithScopeData = await queryResponse;
     
-    unpackPluginNodes(lensWithScopeData.scope);
+    unpackPluginNodes(lensWithScopeData);
 
     return lensWithScopeData;
 };

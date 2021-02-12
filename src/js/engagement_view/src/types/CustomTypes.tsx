@@ -49,7 +49,7 @@ export type VizNode = VizNodeMeta & NodeProperties;
 export type Link = {
     source: number,
     target: number,
-    name: string,
+    name: string, 
 }
 
 export type VizGraph = {

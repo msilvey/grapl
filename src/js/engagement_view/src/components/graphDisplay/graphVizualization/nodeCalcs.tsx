@@ -3,7 +3,7 @@ import { VizGraph, VizNode } from "../../../types/CustomTypes";
 export const calcNodeRiskPercentile = (
 	_nodeRisk: number | { risk: number },
 	_allRisks: any
-) => {
+): number => {
 	let nodeRisk = _nodeRisk;
 	let riskIndex = 0;
 
@@ -16,7 +16,7 @@ export const calcNodeRiskPercentile = (
 	}
 	if (nodeRisk === undefined || nodeRisk === 0 || allRisks.length === 0) {
 		return 0;
-	}	
+	}
 
 	for (const risk of allRisks) {
 		if (nodeRisk >= risk) {
@@ -26,19 +26,19 @@ export const calcNodeRiskPercentile = (
 	return Math.floor((riskIndex / allRisks.length) * 100);
 };
 
-export const nodeRisk = (node: VizNode, Graph: VizGraph) => {
-	const nodes = [...Graph.nodes].map((node) => node.risk);
-	const _node = node as any; 
-	
+export const nodeSize = (node: VizNode, graphData: VizGraph): number => {
+	const nodes = [...graphData.nodes].map((node) => node.risk);
+	const _node = node as any;
+
 	const riskPercentile = calcNodeRiskPercentile(_node.risk_score, nodes);
 
 	if (riskPercentile >= 75) {
-		return 6;
+		return 7;
 	} else if (riskPercentile >= 50) {
-		return 5;
+		return 6;
 	} else if (riskPercentile >= 25) {
-		return 4;
+		return 5;
 	} else {
-		return 3;
+		return 4;
 	}
 };

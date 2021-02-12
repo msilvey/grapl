@@ -125,6 +125,7 @@ export const EngagementUx = () => {
 		if (engagementState.renderedOnce) {
 			return;
 		}
+
 		const interval = setInterval(async () => {
 			await checkLogin().then((loggedIn) => {
 				if (!loggedIn) {
@@ -136,7 +137,8 @@ export const EngagementUx = () => {
 					renderedOnce: true,
 				});
 			});
-		}, 2000);
+		}, 1000);
+
 		return () => {
 			clearInterval(interval);
 		};
