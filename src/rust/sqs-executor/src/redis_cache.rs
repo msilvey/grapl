@@ -9,7 +9,7 @@ use darkredis::{ConnectionPool,
 use grapl_observe::{metric_reporter::{tag,
                                       MetricReporter},
                     timers::TimedFutureExt};
-use tokio::time::Elapsed;
+use tokio::time::error::Elapsed;
 use tracing::warn;
 
 use crate::{cache::{Cache,

@@ -11,7 +11,7 @@ use tokio::runtime::Runtime;
 // Then we should retrieve asset id 'A'
 #[test]
 fn map_hostname_to_asset_id() {
-    let mut runtime = Runtime::new().unwrap();
+    let runtime = Runtime::new().unwrap();
 
     let asset_id_db = AssetIdDb::new(DynamoDbClient::from_env());
 

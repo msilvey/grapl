@@ -15,8 +15,8 @@ use rusoto_s3::{GetObjectError,
                 GetObjectRequest,
                 S3};
 use rusoto_sqs::Message as SqsMessage;
-use tokio::{io::AsyncReadExt,
-            time::Elapsed};
+use tokio::{io::{AsyncReadExt},
+            time::error::Elapsed};
 use tracing::{debug,
               error,
               info};
