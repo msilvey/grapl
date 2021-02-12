@@ -1,6 +1,4 @@
-import {
-	GraphState,
-} from "../../../types/GraphDisplayTypes";
+import { GraphState } from "../../../types/GraphDisplayTypes";
 
 import { retrieveGraph } from "../../../services/graphQLRequests/retrieveGraphReq";
 import { vizGraphFromLensScope } from "../graphLayout/vizGraphFromLensScope";
@@ -15,7 +13,7 @@ export const updateGraph = async (
 		console.log("No lens names");
 		return;
 	}
-	
+
 	const curLensName = engagementState.curLensName;
 
 	await retrieveGraph(lensName)

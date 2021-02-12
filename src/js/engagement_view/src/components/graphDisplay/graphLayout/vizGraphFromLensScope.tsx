@@ -3,7 +3,6 @@ import { traverseNodes, traverseNeighbors, mapEdges } from "./graph_traverse";
 import { getNodeLabel } from "./labels";
 
 import {
-	Lens,
 	Link,
 	VizGraph,
 	BaseNodeProperties,

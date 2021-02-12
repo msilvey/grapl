@@ -1,4 +1,4 @@
-import {Lens, Node} from '../../types/CustomTypes';
+import {Node} from '../../types/CustomTypes';
 import {unpackPluginNodes} from './utils_retrieveGraph/unpackPluginNodes';
 import {expandLensScopeQuery} from './utils_retrieveGraph/expandLensScopeQuery';
 
@@ -17,7 +17,6 @@ export const retrieveGraph = async (lens: string): Promise<Node[]> => {
                 if(res.errors){
                     console.log("Unable to retrieve graph data ", res.errors)
                 }
-                console.log('Retrieved Graph Data: ', res);
                 return res
             })
             .then((res) => res.data)

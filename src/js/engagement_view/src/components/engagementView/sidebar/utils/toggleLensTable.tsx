@@ -61,7 +61,7 @@ export function ToggleLensTable({ setLens }: ToggleLensTableProps) {
 					}
 				}
 			);
-		}, 5000);
+		}, 1000);
 		return () => clearInterval(interval);
 	});
 

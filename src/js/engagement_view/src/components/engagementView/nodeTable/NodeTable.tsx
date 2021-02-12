@@ -42,6 +42,11 @@ function NodeTable({ node }: NodeTableProps) {
 		"fy",
 	]);
 
+
+    mapEdgeProps(node as any, (edgeName: any, _neighbor: any) => {
+        hidden.add(edgeName)
+    });
+
 	const displayNode = {} as OtherNodeProperties;
 
 	mapNodeProps(node, (propName: string) => {

@@ -3,7 +3,7 @@ import React, {
 	useState,
 	useMemo,
 	useCallback,
-	useRef,
+	// useRef,
 } from "react";
 import { ForceGraph2D } from "react-force-graph";
 import { nodeFillColor, riskOutline } from "./graphVizualization/nodeStyling";
@@ -21,11 +21,7 @@ import {
 	GraphDisplayProps,
 } from "../../types/GraphDisplayTypes";
 
-
-type HoverState = VizNode | null;
 type ClickedNodeState = VizNode | null;
-
-// const NODE_R = 8;
 
 const defaultGraphDisplayState = (
 	lensName: string | null
@@ -36,100 +32,57 @@ const defaultGraphDisplayState = (
 	};
 };
 
-const defaultHoverState = (): HoverState => {
-	return null;
-};
 const defaultClickedState = (): ClickedNodeState => {
 	return null;
 };
 
 const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
-	const fgRef: any = useRef(); // fix graph to canvas
+	// const fgRef: any = useRef(); // fix graph to canvas
 	const [state, setState] = useState(defaultGraphDisplayState(lensName));
-	const [timeInterval, setTimeInterval ] = useState(0);
-	
+
 	useEffect(() => {
 		const interval = setInterval(async () => {
 			if (lensName) {
 				await updateGraph(lensName, state as GraphState, setState); // state is safe cast, check that lens name is not null
 			}
-		}, 5000);
+		}, 2000);
 		return () => {
 			clearInterval(interval);
 		};
 	}, [lensName, state, setState]);
 
-	// const data = state.graphData
 	const data = useMemo(() => {
 		const graphData = state.graphData;
-		
-		
 
 		return graphData;
 	}, [state]);
-
-	const [highlightNodes, setHighlightNodes] = useState(new Set());
-	const [highlightLinks, setHighlightLinks] = useState(new Set());
-	const [hoverNode, setHoverNode] = useState(defaultHoverState());
 	const [clickedNode, setClickedNode] = useState(defaultClickedState());
 
-	const updateHighlight = () => {
-		setHighlightNodes(highlightNodes);
-		setHighlightLinks(highlightLinks);
-	};
-
-	const handleNodeHover = (node: VizNode) => {
-		highlightNodes.clear();
-		highlightLinks.clear();
-
-		if (node) {
-			highlightNodes.add(node);
-			node.neighbors?.forEach((neighbor) => highlightNodes.add(neighbor));
-			node.links?.forEach((link) => highlightLinks.add(link));
-		}
-
-		setHoverNode(node || null);
-		updateHighlight();
-	};
-
-	const handleLinkHover = (link: Link) => {
-		highlightNodes.clear();
-		highlightLinks.clear();
-
-		if (link) {
-			highlightLinks.add(link);
-			highlightNodes.add(link.source);
-			highlightNodes.add(link.target);
-		}
-		updateHighlight();
-	};
-
 	const nodeStyling = useCallback(
-		(node, ctx, globalScale) => {
+		(node, ctx) => {
 			node.fx = node.x;
 			node.fy = node.y;
+			ctx.save();
 
 			const NODE_R = nodeSize(node, data);
-			
+
 			ctx.beginPath(); // add ring to highlight hovered & neighbor nodes
 			ctx.arc(node.x, node.y, NODE_R * 1.4, 0, 2 * Math.PI, false);
-			ctx.fillStyle = node === hoverNode ? "darkorange" : riskOutline(node.risk_score); // hovered node || risk score outline
+			ctx.fillStyle =
+				node === clickedNode ? "cyan" : riskOutline(node.risk_score); // hovered node || risk score outline
 			ctx.fill();
-			ctx.restore();
-			ctx.save();
 
 			// Node color
 			ctx.beginPath();
 			ctx.arc(node.x, node.y, NODE_R * 1.2, 0, 2 * Math.PI, false); // risk
-
 			ctx.fillStyle =
 				node === clickedNode ? "#DEFF00" : nodeFillColor(node.dgraph_type[0]);
-			ctx.fill(); 
+			ctx.fill();
 			ctx.save();
 
 			const label = node.nodeLabel;
+
 			ctx.font = "50px Roboto";
-			
 			const fontSize = Math.min(98, NODE_R / ctx.measureText(label).width);
 			ctx.font = `${fontSize + 5}px Roboto`;
 
@@ -142,8 +95,8 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
 
 			ctx.fillRect(
-				node.x - labelBkgdDimensions[0] / 2, // rectangle x coordinate
-				node.y - labelBkgdDimensions[1] - 2.75, // rectangle y coordinate
+				node.x - labelBkgdDimensions[0] / 2, // x coordinate
+				node.y - labelBkgdDimensions[1] - 2.75, // y coordinate
 				labelBkgdDimensions[0] + 1.25, // rectangle width
 				labelBkgdDimensions[1] + 5.5 // rectangle height
 			);
@@ -154,7 +107,7 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			ctx.fillText(label, node.x, node.y);
 			ctx.save();
 		},
-		[hoverNode, clickedNode]
+		[data, clickedNode]
 	);
 
 	const linkStyling = (link: any, ctx: any) => {
@@ -163,6 +116,7 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 
 		const start = link.source;
 		const end = link.target;
+		ctx.save();
 
 		link.color = calcLinkColor(link, data);
 
@@ -174,6 +128,7 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			x: start.x + (end.x - start.x) / 2,
 			y: start.y + (end.y - start.y) / 2,
 		};
+		ctx.save();
 
 		const relLink = { x: end.x - start.x, y: end.y - start.y };
 		const maxTextLength =
@@ -195,8 +150,8 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			maxTextLength / ctx.measureText(label).width
 		);
 		ctx.font = `${fontSize + 5}px Roboto`;
-		let textWidth = ctx.measureText(label).width;
-		textWidth += Math.round(textWidth * 0.25);
+		// let textWidth = ctx.measureText(label).width;
+		// textWidth += Math.round(textWidth * 0.25);
 
 		// Draw text label
 		ctx.save();
@@ -211,58 +166,35 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 	return (
 		<ForceGraph2D
 			graphData={data}
-			ref={fgRef}
+			// ref={fgRef}
 			nodeLabel={"nodeLabel"} // tooltip on hover, actual label is in nodeCanvasObject
-			nodeCanvasObjectMode={(node) =>
-				highlightNodes.has(node) ? "before" : "after"
-			}
 			nodeCanvasObject={nodeStyling}
+			nodeCanvasObjectMode={() => "after"}
 			onNodeClick={(_node, ctx) => {
 				const node = _node as VizNode;
 				setCurNode(node);
-				setHoverNode(node || null);
 				setClickedNode(node || null);
 			}}
 			onNodeDragEnd={(node) => {
 				node.fx = node.x;
 				node.fy = node.y;
 			}}
-			linkColor={(link) =>
-				highlightLinks.has(link)
-					? "aliceblue"
-					: calcLinkColor(link as Link, data as VizGraph)
-			}
-			linkWidth={(link) => (highlightLinks.has(link) ? 10 : 7)}
+			linkColor={(link) => calcLinkColor(link as Link, data as VizGraph)}
+			linkWidth={(link) => 7}
 			linkDirectionalArrowLength={10}
 			linkDirectionalArrowRelPos={1}
 			linkDirectionalParticleSpeed={0.005}
 			linkDirectionalParticleColor={(link) => "#919191"}
 			linkDirectionalParticles={1}
 			linkDirectionalParticleWidth={(link) =>
-				highlightLinks.has(link)
-					? calcLinkParticleWidth(link as Link, data as VizGraph) + 2
-					: calcLinkParticleWidth(link as Link, data as VizGraph) + 1
+				calcLinkParticleWidth(link as Link, data as VizGraph) + 1
 			}
 			linkCanvasObjectMode={() => "after"}
 			linkCanvasObject={linkStyling}
 			warmupTicks={100}
 			cooldownTicks={100}
-			onNodeHover={(_node) => {
-				if (!_node) {
-					return;
-				}
-				const node = _node as VizNode;
-				handleNodeHover(node);
-			}}
-			onLinkHover={(_link) => {
-				if (!_link) {
-					return;
-				}
-				const link = _link as Link;
-				handleLinkHover(link);
-			}}
 		/>
 	);
 };
 
-export default GraphDisplay; //GraphDispaly
+export default GraphDisplay;
