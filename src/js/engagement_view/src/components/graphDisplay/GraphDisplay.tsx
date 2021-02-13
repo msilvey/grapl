@@ -3,10 +3,10 @@ import React, {
 	useState,
 	useMemo,
 	useCallback,
-	// useRef,
+	useRef,
 } from "react";
 import { ForceGraph2D } from "react-force-graph";
-import { nodeFillColor, riskOutline } from "./graphVizualization/nodeStyling";
+import { nodeFillColor, riskOutline } from "./graphVizualization/nodeColoring";
 import {
 	calcLinkParticleWidth,
 	calcLinkColor,
@@ -37,7 +37,7 @@ const defaultClickedState = (): ClickedNodeState => {
 };
 
 const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
-	// const fgRef: any = useRef(); // fix graph to canvas
+	const fgRef: any = useRef(); // fix graph to canvas
 	const [state, setState] = useState(defaultGraphDisplayState(lensName));
 
 	useEffect(() => {
@@ -45,7 +45,7 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			if (lensName) {
 				await updateGraph(lensName, state as GraphState, setState); // state is safe cast, check that lens name is not null
 			}
-		}, 2000);
+		}, 5000);
 		return () => {
 			clearInterval(interval);
 		};
@@ -54,9 +54,39 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 	const data = useMemo(() => {
 		const graphData = state.graphData;
 
+		graphData.links.forEach((link) => {
+			const a = graphData.nodes[link.source];
+			const b = graphData.nodes[link.target];
+
+			if (a === undefined || b === undefined) {
+				console.log("undefined:", graphData.nodes);
+				return;
+			}
+			!a.neighbors && (a.neighbors = []);
+			!b.neighbors && (b.neighbors = []);
+			a.neighbors.push(b);
+			b.neighbors.push(a);
+
+			!a.links && (a.links = []);
+			!b.links && (b.links = []);
+			a.links.push(link);
+			b.links.push(link);
+		});
+
+		console.log("graphData", graphData);
+
 		return graphData;
 	}, [state]);
+
 	const [clickedNode, setClickedNode] = useState(defaultClickedState());
+	const [highlightNodes, setHighlightNodes] = useState(new Set());
+	const [highlightLinks, setHighlightLinks] = useState(new Set());
+	const [hoverNode, setHoverNode] = useState(null);
+
+	const updateHighlight = () => {
+		setHighlightNodes(highlightNodes);
+		setHighlightLinks(highlightLinks);
+	};
 
 	const nodeStyling = useCallback(
 		(node, ctx) => {
@@ -70,8 +100,16 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			ctx.arc(node.x, node.y, NODE_R * 1.4, 0, 2 * Math.PI, false);
 			ctx.fillStyle =
 				node === clickedNode ? "cyan" : riskOutline(node.risk_score); // hovered node || risk score outline
+			ctx.fillStyle = 
+				node === hoverNode ? "purple" : riskOutline(node.risk_score)
 			ctx.fill();
+			ctx.save();
 
+			ctx.fillStyle =
+				node === hoverNode ? "yellow" : riskOutline(node.risk_score); // hovered node || risk score outline
+
+			ctx.fill();
+			ctx.save();
 			// Node color
 			ctx.beginPath();
 			ctx.arc(node.x, node.y, NODE_R * 1.2, 0, 2 * Math.PI, false); // risk
@@ -80,6 +118,10 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			ctx.fill();
 			ctx.save();
 
+			// ctx.restore();
+			// ctx.fillStyle = node === hoverNode ? "red": nodeFillColor(node.dgraph_type[0]);
+			// ctx.fill();
+			// ctx.save();
 			const label = node.nodeLabel;
 
 			ctx.font = "50px Roboto";
@@ -107,7 +149,7 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			ctx.fillText(label, node.x, node.y);
 			ctx.save();
 		},
-		[data, clickedNode]
+		[data, clickedNode, hoverNode]
 	);
 
 	const linkStyling = (link: any, ctx: any) => {
@@ -166,10 +208,20 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 	return (
 		<ForceGraph2D
 			graphData={data}
-			// ref={fgRef}
+			ref={fgRef} // fix graph to canvas
 			nodeLabel={"nodeLabel"} // tooltip on hover, actual label is in nodeCanvasObject
 			nodeCanvasObject={nodeStyling}
 			nodeCanvasObjectMode={() => "after"}
+			onNodeHover={(node, ctx) => {
+				highlightNodes.clear();
+				highlightLinks.clear();
+				if (node) {
+					highlightNodes.add(node);
+				}
+
+				setHoverNode(node as any|| null);
+				updateHighlight();
+			}}
 			onNodeClick={(_node, ctx) => {
 				const node = _node as VizNode;
 				setCurNode(node);

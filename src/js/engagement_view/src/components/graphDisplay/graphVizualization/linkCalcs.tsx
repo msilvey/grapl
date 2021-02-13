@@ -1,6 +1,6 @@
 import { VizGraph, Link, VizNode } from "../../../types/CustomTypes";
 import { calcNodeRiskPercentile } from "./nodeCalcs";
-import { riskOutline } from "./nodeStyling";
+import { riskOutline } from "./nodeColoring";
 
 const findNode = (id: number, nodes: VizNode[]) => {
 	for (const node of nodes || []) {
