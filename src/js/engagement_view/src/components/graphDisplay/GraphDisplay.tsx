@@ -53,28 +53,7 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 
 	const data = useMemo(() => {
 		const graphData = state.graphData;
-
-		graphData.links.forEach((link) => {
-			const a = graphData.nodes[link.source];
-			const b = graphData.nodes[link.target];
-
-			if (a === undefined || b === undefined) {
-				console.log("undefined:", graphData.nodes);
-				return;
-			}
-			!a.neighbors && (a.neighbors = []);
-			!b.neighbors && (b.neighbors = []);
-			a.neighbors.push(b);
-			b.neighbors.push(a);
-
-			!a.links && (a.links = []);
-			!b.links && (b.links = []);
-			a.links.push(link);
-			b.links.push(link);
-		});
-
-		console.log("graphData", graphData);
-
+		console.log("graphData", graphData)
 		return graphData;
 	}, [state]);
 
@@ -96,53 +75,40 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 
 			const NODE_R = nodeSize(node, data);
 
-			ctx.beginPath(); // add ring to highlight hovered & neighbor nodes
+			// Node Border Styling
+			ctx.beginPath()
 			ctx.arc(node.x, node.y, NODE_R * 1.4, 0, 2 * Math.PI, false);
 			ctx.fillStyle =
-				node === clickedNode ? "cyan" : riskOutline(node.risk_score); // hovered node || risk score outline
-			ctx.fillStyle = 
-				node === hoverNode ? "purple" : riskOutline(node.risk_score)
+				node === hoverNode ? "cyan" : riskOutline(node.risk_score);
 			ctx.fill();
 			ctx.save();
-
-			ctx.fillStyle =
-				node === hoverNode ? "yellow" : riskOutline(node.risk_score); // hovered node || risk score outline
-
-			ctx.fill();
-			ctx.save();
-			// Node color
-			ctx.beginPath();
-			ctx.arc(node.x, node.y, NODE_R * 1.2, 0, 2 * Math.PI, false); // risk
+			
+			// Node Fill Styling
+			ctx.beginPath(); 
+			ctx.arc(node.x, node.y, NODE_R * 1.2, 0, 2 * Math.PI, false);
 			ctx.fillStyle =
 				node === clickedNode ? "#DEFF00" : nodeFillColor(node.dgraph_type[0]);
 			ctx.fill();
 			ctx.save();
 
-			// ctx.restore();
-			// ctx.fillStyle = node === hoverNode ? "red": nodeFillColor(node.dgraph_type[0]);
-			// ctx.fill();
-			// ctx.save();
+			// Node Label Styling
 			const label = node.nodeLabel;
 
-			ctx.font = "50px Roboto";
 			const fontSize = Math.min(98, NODE_R / ctx.measureText(label).width);
 			ctx.font = `${fontSize + 5}px Roboto`;
 
 			const textWidth = ctx.measureText(label).width;
-
 			const labelBkgdDimensions = [textWidth, fontSize].map(
 				(n) => n + fontSize * 0.2
 			);
 
 			ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
-
 			ctx.fillRect(
 				node.x - labelBkgdDimensions[0] / 2, // x coordinate
 				node.y - labelBkgdDimensions[1] - 2.75, // y coordinate
 				labelBkgdDimensions[0] + 1.25, // rectangle width
 				labelBkgdDimensions[1] + 5.5 // rectangle height
 			);
-
 			ctx.textAlign = "center";
 			ctx.textBaseline = "middle";
 			ctx.fillStyle = "#ffffff";
@@ -212,16 +178,22 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			nodeLabel={"nodeLabel"} // tooltip on hover, actual label is in nodeCanvasObject
 			nodeCanvasObject={nodeStyling}
 			nodeCanvasObjectMode={() => "after"}
-			onNodeHover={(node, ctx) => {
-				highlightNodes.clear();
-				highlightLinks.clear();
-				if (node) {
-					highlightNodes.add(node);
-				}
+			// onNodeHover={(node, ctx) => {
+			// 	highlightNodes.clear();
+			// 	highlightLinks.clear();
 
-				setHoverNode(node as any|| null);
-				updateHighlight();
-			}}
+			// 	if (node) {
+			// 		console.log("node", node)
+			// 		const _node = node as any;
+					
+			// 		highlightNodes.add(node);
+			// 		_node.neighbors.forEach((neighbor: VizNode) => {highlightNodes.add(neighbor)});
+			// 		_node.links.forEach((link: Link) => {highlightLinks.add(link)});
+			// 	}
+
+			// 	setHoverNode(node as any|| null);
+			// 	updateHighlight();
+			// }}
 			onNodeClick={(_node, ctx) => {
 				const node = _node as VizNode;
 				setCurNode(node);
