@@ -53,7 +53,23 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 
 	const data = useMemo(() => {
 		const graphData = state.graphData;
-		console.log("graphData", graphData)
+		console.log("graphdata", graphData);
+
+		// graphData.links.forEach((link) => {
+		// 	const a = graphData.index[link.source];
+		// 	const b = graphData.index[link.target];
+		// 	console.log("a", a);
+		// 	console.log("b", b)
+		// 	!a.neighbors && (a.neighbors = []);
+		// 	!b.neighbors && (b.neighbors = []);
+		// 	a.neighbors.push(b);
+		// 	b.neighbors.push(a);
+
+		// 	!a.links && (a.links = []);
+		// 	!b.links && (b.links = []);
+		// 	a.links.push(link);
+		// });
+
 		return graphData;
 	}, [state]);
 
@@ -76,15 +92,15 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			const NODE_R = nodeSize(node, data);
 
 			// Node Border Styling
-			ctx.beginPath()
+			ctx.beginPath();
 			ctx.arc(node.x, node.y, NODE_R * 1.4, 0, 2 * Math.PI, false);
 			ctx.fillStyle =
 				node === hoverNode ? "cyan" : riskOutline(node.risk_score);
 			ctx.fill();
 			ctx.save();
-			
+
 			// Node Fill Styling
-			ctx.beginPath(); 
+			ctx.beginPath();
 			ctx.arc(node.x, node.y, NODE_R * 1.2, 0, 2 * Math.PI, false);
 			ctx.fillStyle =
 				node === clickedNode ? "#DEFF00" : nodeFillColor(node.dgraph_type[0]);
@@ -185,7 +201,7 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			// 	if (node) {
 			// 		console.log("node", node)
 			// 		const _node = node as any;
-					
+
 			// 		highlightNodes.add(node);
 			// 		_node.neighbors.forEach((neighbor: VizNode) => {highlightNodes.add(neighbor)});
 			// 		_node.links.forEach((link: Link) => {highlightLinks.add(link)});

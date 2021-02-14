@@ -84,8 +84,6 @@ export const vizGraphFromLensScope = (vizGraphData: Node[]): VizGraph => {
 				id: node.uid,
 				nodeType,
 				nodeLabel,
-				// links,
-				// neighbors: [],
 			};
 			
 			vizNodeMap.set(node.uid, (vizNode as unknown) as VizNode); // as unknown handles destructuring.
@@ -95,10 +93,12 @@ export const vizGraphFromLensScope = (vizGraphData: Node[]): VizGraph => {
 	// Because "nodes" is an array object we need to convert our data to use the 
 	// id property values of entries in the array instead of the indexes of the array.
 	const index = {} as { [key: number]: VizNode };
-
+	
 	for (const vizNode of vizNodeMap.values()) {
-		index[vizNode.uid] = vizNode;
 		nodes.push(vizNode);
+		if(!index[vizNode.uid]){
+			index[vizNode.uid] = vizNode;
+		}
 	}
 
 	// Return data in format for react-force-graph display
