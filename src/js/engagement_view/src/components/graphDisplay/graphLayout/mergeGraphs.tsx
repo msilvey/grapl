@@ -23,13 +23,16 @@ export const mergeGraphs = (
 	// Merges two graphs into a new graph
 	// returns 'null' if there are no updates to be made
 
+	console.log("curGraph", curGraph);
+	console.log("graphUpdate", graphUpdate);
+
 	if (!graphUpdate.nodes && !graphUpdate.links) {
 		return null;
 	}
 
 	let updated = false;
 
-	const outputGraph: VizGraph = { nodes: [], links: [], index: [] };
+	const outputGraph: VizGraph = { nodes: [], links: [], index: {} };
 	const nodes = new Map();
 	const links = new Map();
 
@@ -71,9 +74,30 @@ export const mergeGraphs = (
 	outputGraph.nodes = Array.from(nodes.values());
 	outputGraph.links = Array.from(links.values());
 
-	for (const node of nodes.values()) {
+	for (const node of outputGraph.nodes) {
 		outputGraph.index[node.uid] = node;
 	}
+
+	outputGraph.links.forEach((link) => {
+		const a = outputGraph.index[link.source];
+		const b = outputGraph.index[link.target];
+
+		if(a === undefined || !b === undefined){
+			return;
+		}
+
+		!a.neighbors && (a.neighbors = []);
+		!b.neighbors && (b.neighbors = []);
+
+		a.neighbors.push(b);
+		b.neighbors.push(a);
+
+		!a.links && (a.links = []);
+		!b.links && (b.links = []);
+
+		a.links.push(link);
+		b.links.push(link);
+	});
 
 	if (updated) {
 		return outputGraph;

@@ -55,21 +55,6 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 		const graphData = state.graphData;
 		console.log("graphdata", graphData);
 
-		// graphData.links.forEach((link) => {
-		// 	const a = graphData.index[link.source];
-		// 	const b = graphData.index[link.target];
-		// 	console.log("a", a);
-		// 	console.log("b", b)
-		// 	!a.neighbors && (a.neighbors = []);
-		// 	!b.neighbors && (b.neighbors = []);
-		// 	a.neighbors.push(b);
-		// 	b.neighbors.push(a);
-
-		// 	!a.links && (a.links = []);
-		// 	!b.links && (b.links = []);
-		// 	a.links.push(link);
-		// });
-
 		return graphData;
 	}, [state]);
 
@@ -194,24 +179,35 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			nodeLabel={"nodeLabel"} // tooltip on hover, actual label is in nodeCanvasObject
 			nodeCanvasObject={nodeStyling}
 			nodeCanvasObjectMode={() => "after"}
-			// onNodeHover={(node, ctx) => {
-			// 	highlightNodes.clear();
-			// 	highlightLinks.clear();
+			onNodeHover={(node, ctx) => {
+				highlightNodes.clear();
+				highlightLinks.clear();
 
-			// 	if (node) {
-			// 		console.log("node", node)
-			// 		const _node = node as any;
+				if (node) {
+					const _node = node as any;
+					highlightNodes.add(_node);
 
-			// 		highlightNodes.add(node);
-			// 		_node.neighbors.forEach((neighbor: VizNode) => {highlightNodes.add(neighbor)});
-			// 		_node.links.forEach((link: Link) => {highlightLinks.add(link)});
-			// 	}
+					if(!_node.neighbors){
+						return; 
+					}
+					
+					_node.neighbors.forEach((neighbor: VizNode) => {
+						highlightNodes.add(neighbor);
+					});
+					_node.links.forEach((link: Link) => {
+						highlightLinks.add(link);
+					});
+				}
 
-			// 	setHoverNode(node as any|| null);
-			// 	updateHighlight();
-			// }}
+				setHoverNode((node as any) || null);
+				updateHighlight();
+			}}
 			onNodeClick={(_node, ctx) => {
 				const node = _node as VizNode;
+				console.log("node becore", node);
+				delete node.links;
+				delete node.neighbors;
+				console.log("node", node);
 				setCurNode(node);
 				setClickedNode(node || null);
 			}}
@@ -219,18 +215,34 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 				node.fx = node.x;
 				node.fy = node.y;
 			}}
-			linkColor={(link) => calcLinkColor(link as Link, data as VizGraph)}
-			linkWidth={(link) => 7}
+			linkColor={(link) =>
+				highlightLinks.has(link) ? "white" : calcLinkColor(link as Link, data as VizGraph)
+			}
+			linkWidth={(link) => (highlightLinks.has(link) ? 5 : 4)}
 			linkDirectionalArrowLength={10}
 			linkDirectionalArrowRelPos={1}
 			linkDirectionalParticleSpeed={0.005}
 			linkDirectionalParticleColor={(link) => "#919191"}
 			linkDirectionalParticles={1}
 			linkDirectionalParticleWidth={(link) =>
-				calcLinkParticleWidth(link as Link, data as VizGraph) + 1
+				highlightLinks.has(link)
+					? 4
+					: calcLinkParticleWidth(link as Link, data as VizGraph) + 1
 			}
 			linkCanvasObjectMode={() => "after"}
 			linkCanvasObject={linkStyling}
+			onLinkHover={(link) => {
+				highlightNodes.clear();
+				highlightLinks.clear();
+
+				if (link) {
+					highlightLinks.add(link);
+					highlightNodes.add(link.source);
+					highlightNodes.add(link.target);
+
+					// Graph.linkColor((link)=> "white")
+				}
+			}}
 			warmupTicks={100}
 			cooldownTicks={100}
 		/>
