@@ -2,31 +2,49 @@ import { mapNodeProps } from "./mapNodeProps";
 import { VizGraph, VizNode } from "../../../types/CustomTypes";
 
 // if graph has updated, merge y into x
-export const mergeNodes = (x: VizNode, y: VizNode) => {
+export const mergeNodes = (node: VizNode, newNode: VizNode) => {
 	let merged = false;
+	let nodeWithoutVizFormatting = {} as VizNode;
+	for(const prop in node){
+		if(
+			prop === "fx" || 
+			prop === "fy" ||
+			prop === "links" ||
+			prop === "neighbors" ||
+			prop === "vx" || 
+			prop === "vy" || 
+			prop === "x" || 
+			prop === "y" || 
+			prop === "vx" || 
+			prop === "vy"
+		){
+			continue; 
+		} 
 
-	mapNodeProps(y, (prop: string) => {
-		if (!Object.prototype.hasOwnProperty.call(x, prop)) {
-			if ((x as any)[prop] !== (y as any)[prop]) {
-				(x as any)[prop] = (y as any)[prop];
+		nodeWithoutVizFormatting[prop] = node[prop]; 
+	}
+
+	const _node = nodeWithoutVizFormatting;
+
+	mapNodeProps(newNode, (prop: string) => {
+		if (!Object.prototype.hasOwnProperty.call(_node, prop)) {
+			if ((_node as any)[prop] !== (newNode as any)[prop]) {
+				(_node as any)[prop] = (newNode as any)[prop];
 				merged = true;
 			}
 		}
+		return;
 	});
 	return merged;
 };
 
 export const mergeGraphs = (
 	curGraph: VizGraph,
-	graphUpdate: VizGraph
+	updateGraph: VizGraph
 ): VizGraph | null => {
-	// Merges two graphs into a new graph
-	// returns 'null' if there are no updates to be made
+	// Merges two graphs into a new graph, returns 'null' when there are no new updates
 
-	console.log("curGraph", curGraph);
-	console.log("graphUpdate", graphUpdate);
-
-	if (!graphUpdate.nodes && !graphUpdate.links) {
+	if (!updateGraph.nodes && !updateGraph.links) {
 		return null;
 	}
 
@@ -40,7 +58,7 @@ export const mergeGraphs = (
 		nodes.set(node.uid, node);
 	}
 
-	for (const newNode of graphUpdate.nodes) {
+	for (const newNode of updateGraph.nodes) {
 		const node = nodes.get(newNode.uid);
 		if (node) {
 			if (mergeNodes(node, newNode)) {
@@ -48,23 +66,23 @@ export const mergeGraphs = (
 			}
 		} else {
 			nodes.set(newNode.uid, newNode);
-			// console.debug('new node added ', newNode);
 			updated = true;
 		}
 	}
 
 	for (const link of curGraph.links) {
 		if (link) {
-			const source = link.source;
-			const target = link.target;
-			links.set(source + link.name + target, link);
+			const _link = link as any; 
+			const setLink = _link.source.uid + link.name + _link.target.uid; 
+			links.set(setLink, link);
 		}
 	}
 
-	for (const newLink of graphUpdate.links) {
-		const newLinkSource = newLink.source || newLink.source;
-		const newLinkTarget = newLink.target || newLink.target;
-		const link = links.get(newLinkSource + newLink.name + newLinkTarget);
+
+	for (const newLink of updateGraph.links) {
+		const getLink = newLink.source + newLink.name + newLink.target; 
+		const link = links.get(getLink);
+
 		if (!link) {
 			links.set(newLink.source + newLink.name + newLink.target, newLink);
 			updated = true;
@@ -79,24 +97,26 @@ export const mergeGraphs = (
 	}
 
 	outputGraph.links.forEach((link) => {
-		const a = outputGraph.index[link.source];
-		const b = outputGraph.index[link.target];
+		// the graph should not be updated if the link is already in the index array
 
-		if(a === undefined || !b === undefined){
+		const sourceNode = outputGraph.index[link.source] as any;
+		const targetNode = outputGraph.index[link.target] as any;
+
+		if (sourceNode === undefined || !targetNode === undefined) {
 			return;
 		}
 
-		!a.neighbors && (a.neighbors = []);
-		!b.neighbors && (b.neighbors = []);
+		!sourceNode.neighbors && (sourceNode.neighbors = new Set());
+		!targetNode.neighbors && (targetNode.neighbors = new Set());
 
-		a.neighbors.push(b);
-		b.neighbors.push(a);
+		sourceNode.neighbors.add(targetNode);
+		targetNode.neighbors.add(sourceNode);
 
-		!a.links && (a.links = []);
-		!b.links && (b.links = []);
+		!sourceNode.links && (sourceNode.links = new Set());
+		!targetNode.links && (targetNode.links = new Set());
 
-		a.links.push(link);
-		b.links.push(link);
+		sourceNode.links.add(link);
+		targetNode.links.add(link);
 	});
 
 	if (updated) {

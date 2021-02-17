@@ -27,7 +27,7 @@ const defaultGraphDisplayState = (
 	lensName: string | null
 ): GraphDisplayState => {
 	return {
-		graphData: { index: {}, nodes: [], links: [] },
+		graphData: { nodes: [], links: [], index: {}},
 		curLensName: lensName,
 	};
 };
@@ -45,7 +45,7 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			if (lensName) {
 				await updateGraph(lensName, state as GraphState, setState); // state is safe cast, check that lens name is not null
 			}
-		}, 5000);
+		}, 3500);
 		return () => {
 			clearInterval(interval);
 		};
@@ -54,7 +54,6 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 	const data = useMemo(() => {
 		const graphData = state.graphData;
 		console.log("graphdata", graphData);
-
 		return graphData;
 	}, [state]);
 
@@ -121,15 +120,13 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 
 	const linkStyling = (link: any, ctx: any) => {
 		const MAX_FONT_SIZE = 8;
-		const LABEL_NODE_MARGIN = 8 * 1.5;
-
+		const LABEL_NODE_MARGIN = 12; 
 		const start = link.source;
 		const end = link.target;
-		ctx.save();
 
 		link.color = calcLinkColor(link, data);
 
-		// ignore unbounded links
+		// Ignore unbounded links
 		if (typeof start !== "object" || typeof end !== "object") return;
 
 		// Edge label positioning calculations
@@ -137,7 +134,6 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			x: start.x + (end.x - start.x) / 2,
 			y: start.y + (end.y - start.y) / 2,
 		};
-		ctx.save();
 
 		const relLink = { x: end.x - start.x, y: end.y - start.y };
 		const maxTextLength =
@@ -153,14 +149,12 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 		const label = mapLabel(link.name);
 
 		// Estimate fontSize to fit in link length
-		ctx.font = "50px Roboto";
+		ctx.font = "50px Roboto"; 
 		const fontSize = Math.min(
 			MAX_FONT_SIZE,
 			maxTextLength / ctx.measureText(label).width
 		);
 		ctx.font = `${fontSize + 5}px Roboto`;
-		// let textWidth = ctx.measureText(label).width;
-		// textWidth += Math.round(textWidth * 0.25);
 
 		// Draw text label
 		ctx.save();
@@ -187,10 +181,10 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 					const _node = node as any;
 					highlightNodes.add(_node);
 
-					if(!_node.neighbors){
-						return; 
+					if (!_node.neighbors) {
+						return;
 					}
-					
+
 					_node.neighbors.forEach((neighbor: VizNode) => {
 						highlightNodes.add(neighbor);
 					});
@@ -204,10 +198,8 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			}}
 			onNodeClick={(_node, ctx) => {
 				const node = _node as VizNode;
-				console.log("node becore", node);
 				delete node.links;
 				delete node.neighbors;
-				console.log("node", node);
 				setCurNode(node);
 				setClickedNode(node || null);
 			}}
@@ -216,7 +208,9 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 				node.fy = node.y;
 			}}
 			linkColor={(link) =>
-				highlightLinks.has(link) ? "white" : calcLinkColor(link as Link, data as VizGraph)
+				highlightLinks.has(link)
+					? "white"
+					: calcLinkColor(link as Link, data as VizGraph)
 			}
 			linkWidth={(link) => (highlightLinks.has(link) ? 5 : 4)}
 			linkDirectionalArrowLength={10}
@@ -239,8 +233,6 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 					highlightLinks.add(link);
 					highlightNodes.add(link.source);
 					highlightNodes.add(link.target);
-
-					// Graph.linkColor((link)=> "white")
 				}
 			}}
 			warmupTicks={100}

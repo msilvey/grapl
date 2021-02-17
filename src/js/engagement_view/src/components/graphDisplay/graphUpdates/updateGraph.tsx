@@ -18,21 +18,21 @@ export const updateGraph = async (
 
 	await retrieveGraph(lensName)
 		.then(async (scope) => {
-			const update = vizGraphFromLensScope(scope);
-			const mergeUpdate = mergeGraphs(engagementState.graphData, update);
-
-			if (mergeUpdate !== null) {
+			const updatedGraph = vizGraphFromLensScope(scope);
+			const mergeUpdatedGraph = mergeGraphs(engagementState.graphData, updatedGraph);
+			
+			if (mergeUpdatedGraph !== null) {
 				if (curLensName === lensName) {
 					setEngagementState({
 						...engagementState,
 						curLensName: lensName,
-						graphData: mergeUpdate,
+						graphData: mergeUpdatedGraph,
 					});
 				} else {
 					setEngagementState({
 						...engagementState,
 						curLensName: lensName,
-						graphData: update,
+						graphData: updatedGraph,
 					});
 				}
 			}

@@ -84,8 +84,7 @@ export const vizGraphFromLensScope = (vizGraphData: Node[]): VizGraph => {
 				id: node.uid,
 				nodeType,
 				nodeLabel,
-			};
-			
+			}
 			vizNodeMap.set(node.uid, (vizNode as unknown) as VizNode); // as unknown handles destructuring.
 		});
 	}
