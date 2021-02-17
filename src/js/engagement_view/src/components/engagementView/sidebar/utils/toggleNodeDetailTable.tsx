@@ -1,44 +1,40 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 
 import Button from "@material-ui/core/Button";
-import ArrowDropUpOutlinedIcon from '@material-ui/icons/ArrowDropUpOutlined';
-import ArrowDropDownOutlinedIcon from '@material-ui/icons/ArrowDropDownOutlined';
+import KeyboardArrowDownOutlinedIcon from "@material-ui/icons/KeyboardArrowDownOutlined";
+import KeyboardArrowUpOutlinedIcon from "@material-ui/icons/KeyboardArrowUpOutlined";
+import { ToggleNodeTableProps } from "types/LensAndNodeTableTypes";
 
-import {
-    ToggleNodeTableProps,
-} from "types/LensAndNodeTableTypes";
+import { NodeDetails } from "../LensAndNodeTableContainer";
 
+import { useStyles } from "../styles";
 
-import {NodeDetails} from '../LensAndNodeTableContainer'
+export function ToggleNodeDetailTable({ curNode }: ToggleNodeTableProps) {
+	const [toggled, setToggle] = useState(true);
+	const classes = useStyles();
+	return (
+		<div>
+			{
+				curNode && <div className={classes.header}>
+					<b className={classes.title}> Node Details</b>
+					<Button
+						className={classes.button}
+						onClick={() => {
+							setToggle((toggled) => !toggled);
+						}}
+					>
+						{toggled === true ? (
+							<KeyboardArrowUpOutlinedIcon className={classes.expand} />
+						) : (
+							<KeyboardArrowDownOutlinedIcon className={classes.expand} />
+						)}
+					</Button>
+				</div>
+			}
 
-import { useStyles } from '../styles';
-
-
-export function ToggleNodeDetailTable({curNode}: ToggleNodeTableProps) {
-    const [toggled, setToggle] = useState(true);
-    const classes = useStyles();
-    return (
-        <div>
-            <div className={classes.header}>
-                <b className={classes.title}> Node Details</b>
-                <Button
-                    className = {classes.button}
-                    onClick={
-                        () => { setToggle(toggled => !toggled) }
-                    }> 	
-                    {toggled === true ?  <ArrowDropUpOutlinedIcon className={classes.expand}/> : <ArrowDropDownOutlinedIcon className={classes.expand}/> }
-
-                </Button>
-            </div>
-
-            <div className="nodeToggle">
-                {
-                    toggled && curNode && 
-                        <>
-                            { <NodeDetails node={curNode}/> }
-                        </>
-                }
-            </div>
-        </div>
-    )
+			<div className="nodeToggle">
+				{toggled && curNode && <div>{<NodeDetails node={curNode} />}</div>}
+			</div>
+		</div>
+	);
 }

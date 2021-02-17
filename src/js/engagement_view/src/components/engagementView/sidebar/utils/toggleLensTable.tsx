@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 
 import Button from "@material-ui/core/Button";
-import ArrowDropUpOutlinedIcon from '@material-ui/icons/ArrowDropUpOutlined';
-import ArrowDropDownOutlinedIcon from '@material-ui/icons/ArrowDropDownOutlined';
+import KeyboardArrowDownOutlinedIcon from '@material-ui/icons/KeyboardArrowDownOutlined';
+import KeyboardArrowUpOutlinedIcon from '@material-ui/icons/KeyboardArrowUpOutlined';
 
 import Divider from "@material-ui/core/Divider";
 import Backdrop from "@material-ui/core/Backdrop";
@@ -83,7 +83,7 @@ export function ToggleLensTable({ setLens }: ToggleLensTableProps) {
 					}}
 				>
 					
-					{toggleTableState.toggled ?  <ArrowDropUpOutlinedIcon className={classes.expand}/> : <ArrowDropDownOutlinedIcon className={classes.expand}/> }
+					{toggleTableState.toggled ?  <KeyboardArrowUpOutlinedIcon className={classes.expand}/> : <KeyboardArrowDownOutlinedIcon className={classes.expand}/> }
 				</Button>
 			</div>
 

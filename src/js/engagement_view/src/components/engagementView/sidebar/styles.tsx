@@ -9,8 +9,10 @@ export const useStyles = makeStyles({
         color: "#fff"
     }, 
     button: {
-        width: ".005%",
+        width: ".05%",
+        height: "50%", 
         color: "white",
+        margin: ".5rem",
         backgroundColor:"#424242",
     },
     title: {
@@ -20,7 +22,9 @@ export const useStyles = makeStyles({
     },
     expand:{
         color: "#42C6FF",
-        margin: "0px"
+        margin: "0px",
+        width: "2rem",
+        height: "2rem",
     },
     header:{
         display: "flex"
