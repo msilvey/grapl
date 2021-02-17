@@ -1,12 +1,9 @@
-import { Lens, VizNode } from "types/CustomTypes";
 import { getNodeType, vizGraphFromLensScope } from "components/graphDisplay/graphLayout/vizGraphFromLensScope";
 import { baseNodeData } from "./engagementView/data/baseNodeData";
-import {mergeNodes} from "components/graphDisplay/graphLayout/mergeGraphs";
 
 import {vizGraphData, vizGraphReturnData} from "./engagementView/data/graphVizData";
 import {mergeGraphs} from "components/graphDisplay/graphLayout/mergeGraphs";
-import {initalGraphData, curGraphData, updatedGraphData, outputGraphData} from "./engagementView/data/mergeGraphData"; 
-import {initialNodeX, initialNodeY} from "./engagementView/data/mergeNodeData";
+import {initalGraphData, updatedGraphData} from "./engagementView/data/mergeGraphData"; 
 
 // graphQLAdjacencyMatrix
 test("get node type from dGraph type", () => {
@@ -22,9 +19,5 @@ test("merge graph data HAS changed and graph WILL be updated", () => {
 })
 
 test("merge graph data has NOT changed and graph WILL NOT be updated", () => {
-	expect(mergeGraphs(initalGraphData as any, updatedGraphData as any)).toBe(null)
+	expect(mergeGraphs(initalGraphData as any, initalGraphData as any)).toBe(null)
 })
-
-// test("nodes merge successfully", () => {
-// 	expect(mergeNodes(initialNodeX as unknown as VizNode, initialNodeY as unknown as VizNode)).toBeTruthy();
-// })
