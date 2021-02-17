@@ -197,11 +197,19 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 				updateHighlight();
 			}}
 			onNodeClick={(_node, ctx) => {
-				const node = _node as VizNode;
+				const node = _node as any;
+				const links = node.links; 
+				const neighbors = node.neighbors;
+				// remove neighbors and links for node detail table iteration (react can only iterate through arrays)
 				delete node.links;
 				delete node.neighbors;
+	
 				setCurNode(node);
 				setClickedNode(node || null);
+				
+				// re-add neighbors for highlighting links
+				node.links = links
+				node.neighbors = neighbors
 			}}
 			onNodeDragEnd={(node) => {
 				node.fx = node.x;

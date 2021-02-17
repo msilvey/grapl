@@ -14,8 +14,8 @@ export function ToggleNodeDetailTable({ curNode }: ToggleNodeTableProps) {
 	const classes = useStyles();
 	return (
 		<div>
-			{
-				curNode && <div className={classes.header}>
+			{curNode && (
+				<div className={classes.header}>
 					<b className={classes.title}> Node Details</b>
 					<Button
 						className={classes.button}
@@ -30,7 +30,7 @@ export function ToggleNodeDetailTable({ curNode }: ToggleNodeTableProps) {
 						)}
 					</Button>
 				</div>
-			}
+			)}
 
 			<div className="nodeToggle">
 				{toggled && curNode && <div>{<NodeDetails node={curNode} />}</div>}

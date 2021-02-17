@@ -78,7 +78,6 @@ export const mergeGraphs = (
 		}
 	}
 
-
 	for (const newLink of updateGraph.links) {
 		const getLink = newLink.source + newLink.name + newLink.target; 
 		const link = links.get(getLink);
