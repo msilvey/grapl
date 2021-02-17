@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 
 import Button from "@material-ui/core/Button";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ArrowDropUpOutlinedIcon from '@material-ui/icons/ArrowDropUpOutlined';
+import ArrowDropDownOutlinedIcon from '@material-ui/icons/ArrowDropDownOutlined';
+
 import Divider from "@material-ui/core/Divider";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
@@ -66,6 +68,7 @@ export function ToggleLensTable({ setLens }: ToggleLensTableProps) {
 	});
 
 	return (
+	
 		<>
 			<div className={classes.header}>
 				<b className={classes.title}> Lenses </b>
@@ -76,9 +79,11 @@ export function ToggleLensTable({ setLens }: ToggleLensTableProps) {
 							...toggleTableState,
 							toggled: !toggleTableState.toggled,
 						});
+						
 					}}
 				>
-					<ExpandMoreIcon className={classes.expand} />
+					
+					{toggleTableState.toggled ?  <ArrowDropUpOutlinedIcon className={classes.expand}/> : <ArrowDropDownOutlinedIcon className={classes.expand}/> }
 				</Button>
 			</div>
 

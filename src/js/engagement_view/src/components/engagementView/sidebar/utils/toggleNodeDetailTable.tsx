@@ -1,7 +1,8 @@
 import React, {useState} from "react";
 
 import Button from "@material-ui/core/Button";
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ArrowDropUpOutlinedIcon from '@material-ui/icons/ArrowDropUpOutlined';
+import ArrowDropDownOutlinedIcon from '@material-ui/icons/ArrowDropDownOutlined';
 
 import {
     ToggleNodeTableProps,
@@ -14,7 +15,7 @@ import { useStyles } from '../styles';
 
 
 export function ToggleNodeDetailTable({curNode}: ToggleNodeTableProps) {
-    const [toggled, toggle] = useState(true);
+    const [toggled, setToggle] = useState(true);
     const classes = useStyles();
     return (
         <div>
@@ -23,9 +24,10 @@ export function ToggleNodeDetailTable({curNode}: ToggleNodeTableProps) {
                 <Button
                     className = {classes.button}
                     onClick={
-                        () => { toggle(toggled => !toggled) }
+                        () => { setToggle(toggled => !toggled) }
                     }> 	
-                    <ExpandMoreIcon className={classes.expand}/> 
+                    {toggled === true ?  <ArrowDropUpOutlinedIcon className={classes.expand}/> : <ArrowDropDownOutlinedIcon className={classes.expand}/> }
+
                 </Button>
             </div>
 

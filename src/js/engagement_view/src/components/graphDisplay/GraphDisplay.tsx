@@ -45,7 +45,7 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			if (lensName) {
 				await updateGraph(lensName, state as GraphState, setState); // state is safe cast, check that lens name is not null
 			}
-		}, 3500);
+		}, 1000);
 		return () => {
 			clearInterval(interval);
 		};
