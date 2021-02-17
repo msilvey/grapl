@@ -5,6 +5,7 @@ import { riskOutline } from "./nodeColoring";
 const findNode = (id: number, nodes: VizNode[]) => {
 	for (const node of nodes || []) {
 		if (node.id === id) {
+			console.log("node", node)
 			return node;
 		}
 	}
@@ -58,4 +59,28 @@ export const calcLinkParticleWidth = (link: Link, graph: VizGraph): number => {
 	} else {
 		return 2;
 	}
+};
+
+export const calcLinkDirectionalArrowRelPos = (link: Link, graph: VizGraph) => {
+	const _link = link as any; 
+    const node = 
+        findNode(_link.target.uid, graph.nodes);
+
+    if (node === null || node.risk === 0) {
+        return 1.0
+    }
+
+	const nodes = [...graph.nodes].map(node => node.risk);
+	
+    const riskPercentile = calcNodeRiskPercentile(node.risk_score as any, nodes);
+
+    if (riskPercentile >= 75) {
+        return 0.95
+    } else if (riskPercentile >= 50) {
+        return 0.9
+    } else if (riskPercentile >= 25) {
+        return 0.85
+    } else {
+        return 1.0
+    }
 };

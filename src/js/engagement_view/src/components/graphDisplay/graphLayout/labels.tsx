@@ -19,11 +19,11 @@ const getNodeLabel = (nodeType: string, node: NodeProperties) => {
 	}
 };
 
-const mapLabel = (labelType: string) => {
+const getLinkLabel = (labelType: string) => {
 	if (labelType === "children") {
 		return "executed";
 	}
 	return labelType;
 };
 
-export { mapLabel, getNodeLabel };
+export { getLinkLabel, getNodeLabel };
