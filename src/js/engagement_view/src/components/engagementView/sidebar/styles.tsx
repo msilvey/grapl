@@ -7,7 +7,7 @@ export const useStyles = makeStyles({
     backdrop: {
         color: "#fff",
         backgroundColor: "transparent",
-        width: "80%",
+        width: "25%",
     }, 
     button: {
         width: ".05%",
