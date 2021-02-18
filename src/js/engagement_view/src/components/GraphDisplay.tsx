@@ -6,23 +6,23 @@ import React, {
 	useRef,
 } from "react";
 import { ForceGraph2D } from "react-force-graph";
-import { nodeFillColor, riskOutline } from "./graphVizualization/nodeColoring";
+import { nodeFillColor, riskOutline } from "./graphDisplay/graphVizualization/nodeColoring";
 import {
 	calcLinkParticleWidth,
 	calcLinkColor,
 	calcLinkDirectionalArrowRelPos,
-} from "./graphVizualization/linkCalcs";
-import { nodeSize } from "./graphVizualization/nodeCalcs";
-import { getLinkLabel } from "./graphLayout/labels";
-import { updateGraph } from "./graphUpdates/updateGraph";
-import { Link, VizNode, VizGraph } from "../../types/CustomTypes";
+} from "./graphDisplay/graphVizualization/linkCalcs";
+import { nodeSize } from "./graphDisplay/graphVizualization/nodeCalcs";
+import { getLinkLabel } from "./graphDisplay/graphLayout/labels";
+import { updateGraph } from "./graphDisplay/graphUpdates/updateGraph";
+import { Link, VizNode, VizGraph } from  "../types/CustomTypes";
 import {
 	GraphState,
 	GraphDisplayState,
 	GraphDisplayProps,
-} from "../../types/GraphDisplayTypes";
+} from "../types/GraphDisplayTypes";
 
-import { colors } from "./graphVizualization/graphColors";
+import { colors } from "./graphDisplay/graphVizualization/graphColors";
 
 type ClickedNodeState = VizNode | null;
 
@@ -65,6 +65,11 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 	const [highlightLinks, setHighlightLinks] = useState(new Set());
 	const [hoverNode, setHoverNode] = useState(null);
 
+	const updateHighlight = () => {
+		setHighlightNodes(highlightNodes);
+		setHighlightLinks(highlightLinks);
+	};
+
 	const nodeClick = useCallback(
 		(_node, ctx) => {
 			const node = _node as any;
@@ -87,11 +92,6 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 
 	const nodeHover = useCallback(
 		(node, ctx) => {
-			const updateHighlight = () => {
-				setHighlightNodes(highlightNodes);
-				setHighlightLinks(highlightLinks);
-			};
-		
 			highlightNodes.clear();
 			highlightLinks.clear();
 
@@ -114,7 +114,7 @@ const GraphDisplay = ({ lensName, setCurNode }: GraphDisplayProps) => {
 			setHoverNode((node as any) || null);
 			updateHighlight();
 		},
-		[setHoverNode,  highlightLinks, highlightNodes]
+		[setHoverNode, updateHighlight]
 	);
 
 	const nodeStyling = useCallback(
