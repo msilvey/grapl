@@ -20,6 +20,7 @@ export const dasboardStyles = makeStyles( (theme: Theme) =>
         loggedIn: {
             display:"flex", 
             justifyContent: "flex-end",
+            zIndex: 100, 
         }, 
         nav: {
             margin: "2rem",

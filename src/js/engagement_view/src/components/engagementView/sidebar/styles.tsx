@@ -5,8 +5,9 @@ export const useStyles = makeStyles({
         fontSize: "1rem",
     },
     backdrop: {
-        zIndex: 1, 
-        color: "#fff"
+        color: "#fff",
+        backgroundColor: "transparent",
+        width: "80%",
     }, 
     button: {
         width: ".05%",
@@ -42,5 +43,6 @@ export const useStyles = makeStyles({
     head: {
         color: "white",
         fontSize: ".75rem",
-    }
+    },
+
 });
