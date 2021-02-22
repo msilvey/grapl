@@ -39,93 +39,10 @@ LOGGER.setLevel(GRAPL_LOG_LEVEL)
 LOGGER.addHandler(logging.StreamHandler(stream=sys.stdout))
 
 
-class LazyJwtSecret:
-    def __init__(self) -> None:
-        self.secret: Optional[str] = None
-
-    def get(self) -> str:
-        if self.secret is None:
-            self.secret = self._retrieve_jwt_secret()
-        return self.secret
-
-    def _retrieve_jwt_secret(self) -> str:
-        if IS_LOCAL:
-            return self._retrieve_jwt_secret_local()
-        else:
-            jwt_secret_id = os.environ["JWT_SECRET_ID"]
-
-            secretsmanager = boto3.client("secretsmanager")
-
-            jwt_secret: str = secretsmanager.get_secret_value(
-                SecretId=jwt_secret_id,
-            )["SecretString"]
-            return jwt_secret
-
-    def _retrieve_jwt_secret_local(self) -> str:
-        # Theory: This whole code block is deprecated by the `wait-for-it grapl-provision`,
-        # which guarantees that the JWT Secret is, now, in the secretsmanager. - wimax
-
-        timeout_secs = 30
-        jwt_secret: Optional[str] = None
-
-        for _ in range(timeout_secs):
-            try:
-                secretsmanager = boto3.client(
-                    "secretsmanager",
-                    region_name="us-east-1",
-                    aws_access_key_id="dummy_cred_aws_access_key_id",
-                    aws_secret_access_key="dummy_cred_aws_secret_access_key",
-                    endpoint_url="http://secretsmanager.us-east-1.amazonaws.com:4584",
-                )
-
-                jwt_secret = secretsmanager.get_secret_value(
-                    SecretId="JWT_SECRET_ID",
-                )["SecretString"]
-                break
-            except Exception as e:
-                LOGGER.debug(e)
-                time.sleep(1)
-        if not jwt_secret:
-            raise TimeoutError(
-                f"Expected secretsmanager to be available within {timeout_secs} seconds"
-            )
-        return jwt_secret
-
-
-JWT_SECRET = LazyJwtSecret()
-
 DYNAMO: Optional[DynamoDBServiceResource] = None
 
 app = Chalice(app_name="engagement-edge")
 app.api.cors = False
-# Sometimes we pass in a dict. Sometimes we pass the string "True". Weird.
-Res = Union[Dict[str, Any], str]
-
-
-def respond(
-    err: Optional[str],
-    res: Optional[Res] = None,
-    headers: Optional[Dict[str, Any]] = None,
-    status_code: int = 500,
-) -> Response:
-    if not headers:
-        headers = {}
-    if IS_LOCAL:
-        override = app.current_request.headers.get("origin", "")
-        LOGGER.warning(f"overriding origin: {override}")
-        headers = {"Access-Control-Allow-Origin": override, **headers}
-    return Response(
-        body={"error": err} if err else json.dumps({"success": res}),
-        status_code=status_code if err else 200,
-        headers={
-            "Access-Control-Allow-Credentials": "true",
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-            "X-Requested-With": "*",
-            "Access-Control-Allow-Headers": ":authority, Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With",
-            **headers,
-        },
-    )
 
 
 def get_salt_and_pw(
@@ -180,23 +97,6 @@ def login(username: str, password: str) -> Optional[str]:
     return jwt.encode({"username": username}, JWT_SECRET.get(), algorithm="HS256")
 
 
-def check_jwt(headers: Dict[str, Any]) -> bool:
-    encoded_jwt = None
-    for cookie in headers.get("Cookie", "").split(";"):
-        if "grapl_jwt=" in cookie:
-            encoded_jwt = cookie.split("grapl_jwt=")[1].strip()
-
-    if not encoded_jwt:
-        LOGGER.info("encoded_jwt %s", encoded_jwt)
-        return False
-
-    try:
-        jwt.decode(encoded_jwt, JWT_SECRET.get(), algorithms=["HS256"])
-        return True
-    except Exception as e:
-        LOGGER.error("jwt.decode %s", e)
-        return False
-
 
 def lambda_login(event: Any) -> Optional[str]:
     body = event.json_body
@@ -211,53 +111,6 @@ def lambda_login(event: Any) -> Optional[str]:
     if login_res:
         return cookie
     return None
-
-
-RouteFn = TypeVar("RouteFn", bound=Callable[..., Response])
-
-
-def requires_auth(path: str) -> Callable[[RouteFn], RouteFn]:
-    if not IS_LOCAL:
-        path = "/{proxy+}" + path
-
-    def route_wrapper(route_fn: RouteFn) -> RouteFn:
-        @app.route(path, methods=["OPTIONS", "POST"])
-        def inner_route() -> Response:
-            if app.current_request.method == "OPTIONS":
-                return respond(None, {})
-
-            if not check_jwt(app.current_request.headers):
-                LOGGER.warning("not logged in")
-                return respond("Must log in", status_code=403)
-            try:
-                return route_fn()
-            except Exception as e:
-                LOGGER.error(e)
-                return respond("Unexpected Error")
-
-        return cast(RouteFn, inner_route)
-
-    return route_wrapper
-
-
-def no_auth(path: str) -> Callable[[RouteFn], RouteFn]:
-    if not IS_LOCAL:
-        path = "/{proxy+}" + path
-
-    def route_wrapper(route_fn: RouteFn) -> RouteFn:
-        @app.route(path, methods=["OPTIONS", "GET", "POST"])
-        def inner_route() -> Response:
-            if app.current_request.method == "OPTIONS":
-                return respond(None, {})
-            try:
-                return route_fn()
-            except Exception as e:
-                LOGGER.error(f"path {path} had an error: {e}")
-                return respond("Unexpected Error")
-
-        return cast(RouteFn, inner_route)
-
-    return route_wrapper
 
 
 @no_auth("/login")

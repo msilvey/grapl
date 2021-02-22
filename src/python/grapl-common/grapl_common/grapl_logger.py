@@ -15,6 +15,5 @@ def get_module_grapl_logger(default_log_level: str = "ERROR") -> logging.Logger:
     assert caller_module
     logger = logging.getLogger(caller_module.__name__)
     logger.setLevel(os.getenv("GRAPL_LOG_LEVEL", default_log_level))
-    # While a lot of our code defines this, I believe it just doubles our log output
-    # logger.addHandler(logging.StreamHandler(stream=sys.stdout))
+    logger.addHandler(logging.StreamHandler(stream=sys.stdout))
     return logger
