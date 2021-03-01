@@ -6,16 +6,13 @@ import os.path
 
 from typing import Optional, TYPE_CHECKING
 from pathlib import Path
+from grapl_common.grapl_logger import get_module_grapl_logger
 
 if TYPE_CHECKING:
     from mypy_boto3_s3 import S3ServiceResource, S3Client
 
 GRAPL_LOG_LEVEL = os.getenv("GRAPL_LOG_LEVEL")
-LEVEL = "ERROR" if GRAPL_LOG_LEVEL is None else GRAPL_LOG_LEVEL
-LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(LEVEL)
-LOGGER.addHandler(logging.StreamHandler(stream=sys.stdout))
-
+LOGGER = get_module_grapl_logger(GRAPL_LOG_LEVEL)
 
 def load_plugins(bucket_prefix: str, s3: S3Client, path=None) -> None:
     PluginRetriever(

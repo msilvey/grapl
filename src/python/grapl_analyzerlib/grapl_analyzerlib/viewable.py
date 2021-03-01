@@ -24,14 +24,12 @@ if TYPE_CHECKING:
 
 from grapl_analyzerlib.extendable import Extendable
 from grapl_analyzerlib.grapl_client import GraphClient
+from grapl_common.grapl_logger import get_module_grapl_logger
 
 IS_LOCAL: bool = bool(os.environ.get("IS_LOCAL", False))
 
 GRAPL_LOG_LEVEL = os.getenv("GRAPL_LOG_LEVEL")
-LEVEL = "ERROR" if GRAPL_LOG_LEVEL is None else GRAPL_LOG_LEVEL
-LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(LEVEL)
-LOGGER.addHandler(logging.StreamHandler(stream=sys.stdout))
+LOGGER = get_module_grapl_logger(GRAPL_LOG_LEVEL)
 
 V = TypeVar("V", bound="Viewable")
 Q = TypeVar("Q", bound="Queryable")

@@ -20,11 +20,8 @@ BQ = TypeVar("BQ", bound="BaseQuery")
 BV = TypeVar("BV", bound="BaseView")
 
 
-GRAPL_LOG_LEVEL = os.getenv("GRAPL_LOG_LEVEL")
-LEVEL = "ERROR" if GRAPL_LOG_LEVEL is None else GRAPL_LOG_LEVEL
-LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(LEVEL)
-LOGGER.addHandler(logging.StreamHandler(stream=sys.stdout))
+GRAPL_LOG_LEVEL = os.getenv("GRAPL_LOG_LEVEL", "ERROR")
+LOGGER = get_module_grapl_logger(GRAPL_LOG_LEVEL)
 
 
 class BaseSchema(Schema):

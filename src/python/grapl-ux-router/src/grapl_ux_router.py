@@ -20,10 +20,7 @@ if TYPE_CHECKING:
 
     pass
 
-
-LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(GRAPL_LOG_LEVEL)
-LOGGER.addHandler(logging.StreamHandler(stream=sys.stdout))
+LOGGER = get_module_grapl_logger(GRAPL_LOG_LEVEL)
 
 CONTENT_ENCODING = "gzip"
 

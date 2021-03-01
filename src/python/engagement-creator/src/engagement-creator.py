@@ -26,17 +26,15 @@ from grapl_analyzerlib.queryable import Queryable
 from grapl_analyzerlib.viewable import Viewable
 from grapl_common.env_helpers import S3ResourceFactory, SQSClientFactory
 from grapl_common.metrics.metric_reporter import MetricReporter, TagPair
+from grapl_common.grapl_logger import get_module_grapl_logger
 from mypy_boto3_s3 import S3ServiceResource
 from mypy_boto3_sqs import SQSClient
 from typing_extensions import Final, Literal
 
 IS_LOCAL = bool(os.environ.get("IS_LOCAL", False))
 
-GRAPL_LOG_LEVEL = os.getenv("GRAPL_LOG_LEVEL")
-LEVEL = "ERROR" if GRAPL_LOG_LEVEL is None else GRAPL_LOG_LEVEL
-LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(LEVEL)
-LOGGER.addHandler(logging.StreamHandler(stream=sys.stdout))
+GRAPL_LOG_LEVEL = os.getenv("GRAPL_LOG_LEVEL", "ERROR")
+LOGGER = get_module_grapl_logger(GRAPL_LOG_LEVEL)
 
 """
 https://docs.aws.amazon.com/AmazonS3/latest/dev/notification-content-structure.html

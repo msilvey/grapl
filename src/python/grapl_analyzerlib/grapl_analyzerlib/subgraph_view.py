@@ -5,7 +5,7 @@ from typing import (
     MutableMapping,
 )
 
-from graplinc.grapl.api.graph.v1beta1.types_pb2 import MergedEdgeList, MergedGraph
+from graplinc.grapl.api.graph.v1beta1.types_pb2 import MergedEdgeList, MergedGraph, EdgeList
 from grapl_analyzerlib.grapl_client import GraphClient
 
 

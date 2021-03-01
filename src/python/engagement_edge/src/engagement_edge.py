@@ -26,6 +26,7 @@ import boto3
 import jwt
 from chalice import Chalice, CORSConfig, Response
 from grapl_common.env_helpers import DynamoDBResourceFactory
+from grapl_common.grapl_logger import get_module_grapl_logger
 from src.lib.env_vars import BUCKET_PREFIX, GRAPL_LOG_LEVEL, IS_LOCAL
 from src.lib.sagemaker import create_sagemaker_client
 
@@ -34,9 +35,7 @@ if TYPE_CHECKING:
 
     Salt = bytes
 
-LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(GRAPL_LOG_LEVEL)
-LOGGER.addHandler(logging.StreamHandler(stream=sys.stdout))
+LOGGER = get_module_grapl_logger(GRAPL_LOG_LEVEL)
 
 
 class LazyJwtSecret:
