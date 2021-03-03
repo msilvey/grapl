@@ -20,21 +20,16 @@ import './commands'
 // require('./commands')
 
 Cypress.Commands.add('login', () => {
-    beforeEach(() => {
-		cy.request({
-			url: `http://localhost:1234/auth/login`,
-			method: "POST",
-			credentials: "include",
-			headers: new Headers({
-				"Content-Type": "application/json",
-			}),
-			body: JSON.stringify({
-				username: "grapluser",
-				password: "graplpassword",
-			}),
-		}).then((body) => {
-			const grapl_jwt = { user: { authenticationData: { token: body.token } } };
-			window.localStorage.setItem("grapl_jwt", JSON.stringify(grapl_jwt));
-		});
-	});
+    cy.request({
+            url: `http://api.grapl.test:3128/auth/login`, // derive from base URL, don't hardcode
+            method: "POST",
+            credentials: "include",
+            headers: new Headers({
+                    "Content-Type": "application/json",
+            }),
+            body: JSON.stringify({
+                    username: "grapluser",
+                    password: "graplpassword",
+            }),
+    })
 })

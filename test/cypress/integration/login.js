@@ -23,23 +23,12 @@ describe("authentication", () => {
 });
 
 describe("login test", () => {
+	before(() => {
+            cy.login();
+	});
+
 	beforeEach(() => {
-		cy.request({
-			url: `http://localhost:1234/auth/login`,
-			method: "POST",
-			credentials: "include",
-			headers: new Headers({
-				"Content-Type": "application/json",
-			}),
-			body: JSON.stringify({
-				username: "grapluser",
-				password: "graplpassword",
-			}),
-		}).then((body) => {
-			const grapl_jwt = { user: { authenticationData: { token: body.token } } };
-			window.localStorage.setItem("grapl_jwt", JSON.stringify(grapl_jwt));
-		});
-		cy.contains("login").should("not.exist");
+            Cypress.Cookies.preserveOnce('grapl_jwt')
 	});
 
         it("checks to make sure grapl_jwt was set", () => {
