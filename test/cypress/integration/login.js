@@ -40,8 +40,9 @@ describe("login test", () => {
 			window.localStorage.setItem("grapl_jwt", JSON.stringify(grapl_jwt));
 		});
 		cy.contains("login").should("not.exist");
-		it("checks to make sure grapl_jwt was set", () => {
-			cy.getCookie("grapl_jwt").should("exist");
-		})
 	});
+
+        it("checks to make sure grapl_jwt was set", () => {
+                cy.getCookie("grapl_jwt").should("exist");
+        })
 });
