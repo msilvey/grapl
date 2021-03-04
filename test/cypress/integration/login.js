@@ -25,6 +25,7 @@ describe("authentication", () => {
 describe("login test", () => {
 	before(() => {
             cy.login();
+            cy.pause();
 	});
 
 	beforeEach(() => {
