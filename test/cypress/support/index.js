@@ -19,10 +19,6 @@ import './commands'
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 
-Cypress.Cookies.defaults({
-    preserve: 'grapl_jwt'
-})
-
 Cypress.Commands.add('login', () => {
     cy.visit("/");
     cy.contains(/login/i).click();

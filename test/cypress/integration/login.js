@@ -1,16 +1,4 @@
-describe("sanity check", () => {
-	it("passes", () => {
-		expect(true).to.equal(true);
-	});
-});
-
-describe("application loads", () => {
-	it("visits the front page", () => {
-		cy.visit("/");
-	});
-});
-
-describe("authentication", () => {
+describe("without authentication", () => {
 	it("allows the user to log in with a valid username and password", () => {
 		cy.visit("/");
 		cy.contains(/login/i).click();
@@ -22,17 +10,29 @@ describe("authentication", () => {
 	});
 });
 
-describe("login test", () => {
+describe("with authentication", () => {
 	before(() => {
+            cy.clearCookies();
             cy.login();
-            cy.pause();
+	});
+
+	after(() => {
+            cy.clearCookies();
 	});
 
 	beforeEach(() => {
-            Cypress.Cookies.preserveOnce('grapl_jwt')
-	});
+            Cypress.Cookies.preserveOnce('grapl_jwt');
+        });
 
-        it("checks to make sure grapl_jwt was set", () => {
+        it("(1) checks to make sure grapl_jwt was set", () => {
+                cy.getCookie("grapl_jwt").should("exist");
+        })
+
+        it("(2) checks to make sure grapl_jwt was set", () => {
+                cy.getCookie("grapl_jwt").should("exist");
+        })
+
+        it("(3) checks to make sure grapl_jwt was set", () => {
                 cy.getCookie("grapl_jwt").should("exist");
         })
 });
