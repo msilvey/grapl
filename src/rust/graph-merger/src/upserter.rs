@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 use std::{collections::HashMap,
           sync::Arc};
 
@@ -29,10 +30,31 @@ use grapl_graph_descriptions::{graph_description::*,
                                node_property::Property,
                                MergedGraph};
 use grapl_utils::iter_ext::GraplIterExt;
+=======
+use crate::upsert_util;
+use dgraph_query_lib::mutation::Mutation;
+use dgraph_query_lib::queryblock::QueryBlock;
+use dgraph_query_lib::ToQueryString;
+use dgraph_query_lib::{
+    condition::{Condition, ConditionValue},
+    mutation::{MutationBuilder, MutationPredicateValue, MutationUID, MutationUnit},
+    predicate::{Field, Predicate},
+    query::QueryBuilder,
+    queryblock::{QueryBlockBuilder, QueryBlockType},
+    upsert::{Upsert, UpsertBlock},
+};
+use dgraph_tonic::Query;
+use grapl_graph_descriptions::MergedGraph;
+use grapl_graph_descriptions::{graph_description::*, node_property::Property};
+use grapl_utils::iter_ext::GraplIterExt;
+use std::collections::HashMap;
+use std::sync::Arc;
+>>>>>>> internal-286-lens-header-dup
 // use grapl_graph_descriptions::Edge;
 // use grapl_graph_descriptions::EdgeList;
 // use grapl_graph_descriptions::MergedNode;
 // use grapl_graph_descriptions::IdentifiedNode;
+<<<<<<< HEAD
 pub use node_property::Property::{DecrementOnlyInt as ProtoDecrementOnlyIntProp,
                                   DecrementOnlyUint as ProtoDecrementOnlyUintProp,
                                   ImmutableInt as ProtoImmutableIntProp,
@@ -42,6 +64,22 @@ pub use node_property::Property::{DecrementOnlyInt as ProtoDecrementOnlyIntProp,
                                   IncrementOnlyUint as ProtoIncrementOnlyUintProp};
 
 use crate::upsert_util;
+=======
+
+pub use node_property::Property::{
+    DecrementOnlyInt as ProtoDecrementOnlyIntProp,
+    DecrementOnlyUint as ProtoDecrementOnlyUintProp,
+    ImmutableInt as ProtoImmutableIntProp,
+    ImmutableStr as ProtoImmutableStrProp,
+    ImmutableUint as ProtoImmutableUintProp,
+    IncrementOnlyInt as ProtoIncrementOnlyIntProp,
+    IncrementOnlyUint as ProtoIncrementOnlyUintProp,
+};
+
+use dgraph_tonic::{Client as DgraphClient, Mutate, Mutation as DgraphMutation, MutationResponse};
+use futures::StreamExt;
+use futures_retry::{FutureRetry, RetryPolicy};
+>>>>>>> internal-286-lens-header-dup
 
 const DGRAPH_CONCURRENCY_UPSERTS: usize = 8;
 // DGraph Live Loader uses a size of 1,000 elements and they claim this has relatively good performance
@@ -145,7 +183,11 @@ impl GraphMergeHelper {
 
             let uid = node_key_map_to_uid
                 .get(&node_key)
+<<<<<<< HEAD
                 .copied()
+=======
+                .map(|uid| *uid)
+>>>>>>> internal-286-lens-header-dup
                 .or_else(|| uid_from_uids(&node_key, &key_to_query_name, &uids));
             let uid = match uid {
                 Some(uid) => uid,
@@ -294,7 +336,11 @@ impl futures_retry::ErrorHandler<anyhow::Error> for UpsertErrorHandler {
         );
         match attempt {
             0..=5 => RetryPolicy::Repeat,
+<<<<<<< HEAD
             t @ 6..=20 => RetryPolicy::WaitRetry(std::time::Duration::from_millis(10 * t as u64)),
+=======
+            t @ 5..=20 => RetryPolicy::WaitRetry(std::time::Duration::from_millis(10 * t as u64)),
+>>>>>>> internal-286-lens-header-dup
             21..=u64::MAX => RetryPolicy::ForwardError(e),
         }
     }
@@ -358,7 +404,11 @@ fn gen_node_key_query(node_key: &str) -> QueryBlock {
     QueryBlockBuilder::default()
         .query_type(QueryBlockType::query())
         .root_filter(Condition::EQ(
+<<<<<<< HEAD
             "node_key".to_string(),
+=======
+            format!("node_key"),
+>>>>>>> internal-286-lens-header-dup
             ConditionValue::string(node_key),
         ))
         .predicates(vec![
@@ -380,8 +430,13 @@ fn uid_from_uids(
     Some(u64::from_str_radix(&uid[2..], 16).expect("uid is not valid hex"))
 }
 
+<<<<<<< HEAD
 fn extract_node_key_map_uid(
     dgraph_response: &serde_json::Value,
+=======
+fn extract_node_key_map_uid<'a>(
+    dgraph_response: &'a serde_json::Value,
+>>>>>>> internal-286-lens-header-dup
     node_key_map_to_uid: &mut HashMap<String, u64>,
 ) {
     let query_responses = dgraph_response.as_object().expect("Invalid response");

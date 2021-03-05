@@ -7,8 +7,13 @@ description = "A library for interacting with Grapl graphs"
 license = "MIT"
 
 [dependencies]
+anyhow = "*"
 derive_builder = "0.9"
-
+dgraph-tonic = "0.8"
+dgraph_query_lib = { git = "https://github.com/d0nutptr/dgraph_query_lib", branch = "main" }
+futures = "0.3"
+futures-retry = "0.5"
+grapl-utils = { path = "../grapl-utils" }
 log = "0.4"
 prost = "0.7"
 prost-derive = "0.7"
@@ -16,7 +21,12 @@ prost-types = "0.7"
 rand = "0.8"
 serde = "1"
 serde_derive = "1"
+serde_json = "1"
+thiserror = "1"
 tracing = "0.1.22"
+tokio = { version = "0.2.*", features = ["macros"] }
+tracing-subscriber = "*"
+hex = "0.4.2"
 arbitrary = { version="1" }
 
 [dependencies.uuid]
@@ -30,7 +40,6 @@ prost-build = "0.7"
 test-env-log = "0.2.5"
 quickcheck = "1.0.3"
 quickcheck_macros = { version="1" }
-tracing-subscriber = "0.2"
 
 [features]
 default = []

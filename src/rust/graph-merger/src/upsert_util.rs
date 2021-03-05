@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+<<<<<<< HEAD
 use grapl_graph_descriptions::{graph_description::*,
                                node_property::Property};
 use node_property::Property::{DecrementOnlyInt as ProtoDecrementOnlyIntProp,
@@ -9,6 +10,18 @@ use node_property::Property::{DecrementOnlyInt as ProtoDecrementOnlyIntProp,
                               ImmutableUint as ProtoImmutableUintProp,
                               IncrementOnlyInt as ProtoIncrementOnlyIntProp,
                               IncrementOnlyUint as ProtoIncrementOnlyUintProp};
+=======
+use grapl_graph_descriptions::{graph_description::*, node_property::Property};
+use node_property::Property::{
+    DecrementOnlyInt as ProtoDecrementOnlyIntProp,
+    DecrementOnlyUint as ProtoDecrementOnlyUintProp,
+    ImmutableInt as ProtoImmutableIntProp,
+    ImmutableStr as ProtoImmutableStrProp,
+    ImmutableUint as ProtoImmutableUintProp,
+    IncrementOnlyInt as ProtoIncrementOnlyIntProp,
+    IncrementOnlyUint as ProtoIncrementOnlyUintProp,
+};
+>>>>>>> internal-286-lens-header-dup
 
 pub struct Escaped(String);
 
@@ -26,6 +39,10 @@ impl std::fmt::Display for Escaped {
     }
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> internal-286-lens-header-dup
 fn escape_quote(s: &str) -> Escaped {
     // otherwise we need to double quote it
 
@@ -55,7 +72,11 @@ fn escape_prop(node_property: &NodeProperty) -> Escaped {
         Some(ProtoDecrementOnlyUintProp(i)) => escape_quote(&i.to_string()),
         Some(ProtoImmutableUintProp(i)) => escape_quote(&i.to_string()),
         Some(ProtoImmutableStrProp(s)) => escape_quote(s.as_inner()),
+<<<<<<< HEAD
         None => panic!("todo"),
+=======
+        None => panic!("todo")
+>>>>>>> internal-286-lens-header-dup
     }
 }
 
@@ -71,13 +92,18 @@ pub(crate) fn build_upserts(
     let mut inner_queries = String::with_capacity(properties.len() * 32);
     let mut mutations = Vec::with_capacity(properties.len());
 
+<<<<<<< HEAD
     let (creation_var_name, creation_query, creation_quad) =
         node_creation_quads(query_param, &node_key, node_type);
+=======
+    let (creation_var_name, creation_query, creation_quad) = node_creation_quads(query_param, &node_key, node_type);
+>>>>>>> internal-286-lens-header-dup
     key_query_map.insert(_node_key.clone(), creation_var_name.clone());
 
     mutations.push(creation_quad);
     inner_queries.push_str(&creation_query);
     inner_queries.push('\n');
+<<<<<<< HEAD
     for (predicate_param, (prop_name, prop)) in properties.iter().enumerate() {
         if &prop_name == &"node_key" {
             continue;
@@ -85,6 +111,11 @@ pub(crate) fn build_upserts(
         if &prop_name == &"dgraph.type" {
             continue;
         }
+=======
+    for (predicate_param, (prop_name, prop) )in properties.iter().enumerate() {
+        if &prop_name == &"node_key" {continue}
+        if &prop_name == &"dgraph.type" {continue}
+>>>>>>> internal-286-lens-header-dup
         tracing::debug!(
             message="generating upsert quads for predicate",
             predicate_name=?prop_name,
@@ -124,17 +155,28 @@ pub(crate) fn node_creation_quads(
                 node_key,
             }}
     "#,
+<<<<<<< HEAD
         creation_var_name = creation_var_name,
         node_key = escaped_node_key,
+=======
+        creation_var_name=creation_var_name,
+        node_key=escaped_node_key,
+>>>>>>> internal-286-lens-header-dup
     );
 
     // If the node exists, do nothing, otherwise create it with its type
     let mut mu_1 = dgraph_tonic::Mutation::new();
     let mut mu_1_n_quads = format!(
         concat!(
+<<<<<<< HEAD
             r#"_:{creation_var_name} <node_key> {node_key} ."#,
             "\n",
             r#"_:{creation_var_name} <dgraph.type> "{node_type}" ."#,
+=======
+        r#"_:{creation_var_name} <node_key> {node_key} ."#,
+        "\n",
+        r#"_:{creation_var_name} <dgraph.type> "{node_type}" ."#,
+>>>>>>> internal-286-lens-header-dup
         ),
         node_key = escaped_node_key,
         node_type = node_type,
@@ -142,12 +184,19 @@ pub(crate) fn node_creation_quads(
     );
 
     mu_1.set_set_nquads(mu_1_n_quads);
+<<<<<<< HEAD
     mu_1.set_cond(format!(
         "@if(eq(len({creation_var_name}), 0))",
         creation_var_name = creation_var_name
     ));
 
     (creation_var_name, inner_query, mu_1)
+=======
+    mu_1.set_cond(format!("@if(eq(len({creation_var_name}), 0))", creation_var_name=creation_var_name));
+
+    (creation_var_name, inner_query, mu_1)
+
+>>>>>>> internal-286-lens-header-dup
 }
 
 pub(crate) fn gen_node_property_upsert_quads(
@@ -166,38 +215,61 @@ pub(crate) fn gen_node_property_upsert_quads(
         r#"
             var(func: uid({creation_var_name}), first: 1)
     "#,
+<<<<<<< HEAD
         creation_var_name = creation_var_name,
+=======
+        creation_var_name=creation_var_name,
+>>>>>>> internal-286-lens-header-dup
     );
 
     // If the node exists, set the predicate. Currently 'last write wins'.
     let mut mu_0_n_quads = format!(
         r#"uid({creation_var_name}) <{prop_name}> {prop_value} ."#,
+<<<<<<< HEAD
         creation_var_name = creation_var_name,
+=======
+        creation_var_name=creation_var_name,
+>>>>>>> internal-286-lens-header-dup
         prop_name = prop_name,
         prop_value = prop_value,
     );
 
     mu_0.set_set_nquads(mu_0_n_quads);
+<<<<<<< HEAD
     mu_0.set_cond(format!(
         "@if(eq(len({creation_var_name}), 1))",
         creation_var_name = creation_var_name
     ));
+=======
+    mu_0.set_cond(format!("@if(eq(len({creation_var_name}), 1))", creation_var_name=creation_var_name));
+>>>>>>> internal-286-lens-header-dup
 
     let mut mu_1 = dgraph_tonic::Mutation::new();
 
     // condition if the node does not exist
     let mut mu_1_n_quads = format!(
+<<<<<<< HEAD
         concat!(r#"_:{creation_var_name} <{prop_name}> {prop_value} ."#,),
         creation_var_name = creation_var_name,
+=======
+        concat!(
+        r#"_:{creation_var_name} <{prop_name}> {prop_value} ."#,
+        ),
+        creation_var_name=creation_var_name,
+>>>>>>> internal-286-lens-header-dup
         prop_name = prop_name,
         prop_value = prop_value,
     );
 
     mu_1.set_set_nquads(mu_1_n_quads);
+<<<<<<< HEAD
     mu_1.set_cond(format!(
         "@if(eq(len({creation_var_name}), 0))",
         creation_var_name = creation_var_name
     ));
+=======
+    mu_1.set_cond(format!("@if(eq(len({creation_var_name}), 0))", creation_var_name=creation_var_name));
+>>>>>>> internal-286-lens-header-dup
 
     (inner_query, [mu_0, mu_1])
 }

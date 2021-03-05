@@ -1,19 +1,13 @@
-use std::{collections::HashMap,
-          io::Stdout};
-
+use crate::service::GraphMergerError;
 use grapl_graph_descriptions::Edge;
 use grapl_observe::metric_reporter::MetricReporter;
-use grapl_utils::{future_ext::GraplFutureExt,
-                  rusoto_ext::dynamodb::GraplDynamoDbClientExt};
+use grapl_utils::future_ext::GraplFutureExt;
+use grapl_utils::rusoto_ext::dynamodb::GraplDynamoDbClientExt;
 use lazy_static::lazy_static;
-use rusoto_dynamodb::{AttributeValue,
-                      BatchGetItemInput,
-                      DynamoDbClient,
-                      KeysAndAttributes};
-use serde::{Deserialize,
-            Serialize};
-
-use crate::service::GraphMergerError;
+use rusoto_dynamodb::{AttributeValue, BatchGetItemInput, DynamoDbClient, KeysAndAttributes};
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::io::Stdout;
 
 lazy_static! {
     /// timeout for dynamodb queries
@@ -159,13 +153,13 @@ pub async fn get_r_edges_from_dynamodb(
         .map_err(|e| GraphMergerError::Unexpected(e.to_string()))?
         .map_err(|e| GraphMergerError::Unexpected(e.to_string()))?
         .responses
-        .ok_or(GraphMergerError::Unexpected(
-            "Failed to fetch results from dynamodb".to_string(),
-        ))?
+        .ok_or(GraphMergerError::Unexpected(format!(
+            "Failed to fetch results from dynamodb"
+        )))?
         .remove(&schema_table_name)
-        .ok_or(GraphMergerError::Unexpected(
-            "Missing data from expected table in dynamodb".to_string(),
-        ))?;
+        .ok_or(GraphMergerError::Unexpected(format!(
+            "Missing data from expected table in dynamodb"
+        )))?;
 
     /*
        1. Remove entries without f_edge and r_edge

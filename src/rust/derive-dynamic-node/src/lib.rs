@@ -15,19 +15,22 @@ use syn::{parse_quote,
           NestedMeta,
           Type};
 
-const CREATE_TIME: &str = "create_time";
-const LAST_SEEN_TIME: &str = "last_seen_time";
-const TERMINATE_TIME: &str = "terminate_time";
-const IMMUTABLE: &str = "immutable";
-const INCREMENT: &str = "increment";
-const DECREMENT: &str = "decrement";
+
+const CREATE_TIME: &'static str = "create_time";
+const LAST_SEEN_TIME: &'static str = "last_seen_time";
+const TERMINATE_TIME: &'static str = "terminate_time";
+const IMMUTABLE: &'static str = "immutable";
+const INCREMENT: &'static str = "increment";
+const DECREMENT: &'static str = "decrement";
 
 fn name_and_ty(field: &Field) -> (&Ident, &Type, String) {
     let mut resolution = None;
     for attr in &field.attrs {
         on_grapl_attrs(&attr, |attr| {
             match attr {
-                IMMUTABLE | INCREMENT | DECREMENT => resolution = Some(attr.to_string()),
+                IMMUTABLE => resolution = Some(attr.to_string()),
+                INCREMENT => resolution = Some(attr.to_string()),
+                DECREMENT => resolution = Some(attr.to_string()),
                 _ => (),
             };
         });
@@ -54,14 +57,13 @@ pub fn derive_node_description(input: TokenStream) -> TokenStream {
         _ => panic!("Requires named fields"),
     };
 
-    let methods =
-        fields
-            .iter()
-            .map(|field| property_methods(field))
-            .fold(quote!(), |mut acc, method| {
-                acc.extend(method);
-                acc
-            });
+    let methods = fields
+        .iter()
+        .map(|field| property_methods(field))
+        .fold(quote!(), |mut acc, method| {
+            acc.extend(method);
+            acc
+        });
 
     let struct_name = &input.ident;
     let struct_name_string = input.ident.to_string();
@@ -72,7 +74,7 @@ pub fn derive_node_description(input: TokenStream) -> TokenStream {
     let node_trait_name = format!("I{}Node", struct_name);
     let node_trait_name = syn::Ident::new(&node_trait_name, struct_name.span());
 
-    let use_the_dead_code_method_name = format!("__avoid_dead_code_lint_{}", struct_name);
+    let use_the_dead_code_method_name = format!("__avoid_dead_code_lint{}", struct_name);
     let use_the_dead_code_method_name =
         syn::Ident::new(&use_the_dead_code_method_name, struct_name.span());
 
@@ -185,7 +187,7 @@ pub fn derive_grapl_static(input: TokenStream) -> TokenStream {
         }
     });
 
-    assert!(!id_fields.to_string().is_empty());
+    assert!(id_fields.to_string().len() > 0);
 
     let struct_name = &input.ident;
 
@@ -342,6 +344,7 @@ fn resolvable_type_from(
                 .path
                 .segments
                 .iter()
+                .into_iter()
                 .map(|x| x.ident.to_string())
                 .collect::<Vec<String>>()
                 .join("::");
@@ -444,8 +447,7 @@ fn property_methods(field: &Field) -> TS2 {
 
     let property_name_str = format!("{}", property_name);
 
-    let inner_property_name =
-        syn::Ident::new(&format!("__{}", property_name), property_name.span());
+    let inner_property_name = syn::Ident::new(&format!("__{}", property_name), property_name.span());
 
     let set_identity_prop = identity_prop_setter(field, &inner_property_name);
     let mut implementation: TS2 = quote!();

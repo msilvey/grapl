@@ -1,3 +1,11 @@
+<<<<<<< HEAD
+=======
+
+use crate::upserter;
+use crate::upsert_util;
+use crate::reverse_resolver;
+
+>>>>>>> internal-286-lens-header-dup
 use std::{collections::HashMap,
           fmt::Debug,
           io::Stdout,
@@ -6,6 +14,10 @@ use std::{collections::HashMap,
           time::{Duration,
                  SystemTime,
                  UNIX_EPOCH}};
+<<<<<<< HEAD
+=======
+use crate::reverse_resolver::{get_r_edges_from_dynamodb, ReverseEdgeResolver};
+>>>>>>> internal-286-lens-header-dup
 
 use async_trait::async_trait;
 use dgraph_tonic::{Client as DgraphClient,
@@ -17,19 +29,37 @@ use grapl_config::{env_helpers::{s3_event_emitters_from_env,
                                  FromEnv},
                    event_caches};
 use grapl_graph_descriptions::graph_description::{Edge,
+<<<<<<< HEAD
                                                   EdgeList,
                                                   IdentifiedGraph,
                                                   IdentifiedNode,
                                                   MergedGraph,
                                                   MergedNode};
+=======
+                                                  IdentifiedGraph,
+                                                  IdentifiedNode,
+                                                  MergedGraph,
+                                                  MergedNode,
+                                                  EdgeList};
+>>>>>>> internal-286-lens-header-dup
 use grapl_observe::{dgraph_reporter::DgraphMetricReporter,
                     metric_reporter::{tag,
                                       MetricReporter}};
 use grapl_service::{decoder::ZstdProtoDecoder,
                     serialization::MergedGraphSerializer};
+<<<<<<< HEAD
 use grapl_utils::{future_ext::GraplFutureExt,
                   rusoto_ext::dynamodb::GraplDynamoDbClientExt};
 use lazy_static::lazy_static;
+=======
+
+use grapl_utils::{future_ext::GraplFutureExt,
+                  rusoto_ext::dynamodb::GraplDynamoDbClientExt};
+use lazy_static::lazy_static;
+use tracing::{error,
+          info,
+          warn};
+>>>>>>> internal-286-lens-header-dup
 use rusoto_dynamodb::{AttributeValue,
                       BatchGetItemInput,
                       DynamoDb,
@@ -51,6 +81,7 @@ use sqs_executor::{cache::{Cache,
                    event_retriever::S3PayloadRetriever,
                    make_ten,
                    s3_event_emitter::S3ToSqsEventNotifier};
+<<<<<<< HEAD
 use tracing::{error,
               info,
               warn};
@@ -65,6 +96,13 @@ use crate::{reverse_resolver,
 pub struct GraphMerger<CacheT>
 where
     CacheT: Cache + Clone + Send + Sync + 'static,
+=======
+
+#[derive(Clone)]
+pub struct GraphMerger<CacheT>
+    where
+        CacheT: Cache + Clone + Send + Sync + 'static,
+>>>>>>> internal-286-lens-header-dup
 {
     mg_client: Arc<DgraphClient>,
     reverse_edge_resolver: ReverseEdgeResolver,
@@ -73,8 +111,13 @@ where
 }
 
 impl<CacheT> GraphMerger<CacheT>
+<<<<<<< HEAD
 where
     CacheT: Cache + Clone + Send + Sync + 'static,
+=======
+    where
+        CacheT: Cache + Clone + Send + Sync + 'static,
+>>>>>>> internal-286-lens-header-dup
 {
     pub fn new(
         mg_alphas: Vec<String>,
@@ -93,6 +136,10 @@ where
     }
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> internal-286-lens-header-dup
 #[derive(thiserror::Error, Debug)]
 pub enum GraphMergerError {
     #[error("UnexpectedError")]
@@ -107,8 +154,13 @@ impl CheckedError for GraphMergerError {
 
 #[async_trait]
 impl<CacheT> EventHandler for GraphMerger<CacheT>
+<<<<<<< HEAD
 where
     CacheT: Cache + Clone + Send + Sync + 'static,
+=======
+    where
+        CacheT: Cache + Clone + Send + Sync + 'static,
+>>>>>>> internal-286-lens-header-dup
 {
     type InputEvent = IdentifiedGraph;
     type OutputEvent = MergedGraph;
@@ -132,6 +184,7 @@ where
         );
 
         let uncached_nodes = subgraph.nodes.into_iter().map(|(_, n)| n);
+<<<<<<< HEAD
         let mut uncached_edges: Vec<_> = subgraph
             .edges
             .into_iter()
@@ -141,6 +194,10 @@ where
             .reverse_edge_resolver
             .resolve_reverse_edges(uncached_edges.clone())
             .await
+=======
+        let mut uncached_edges: Vec<_> = subgraph.edges.into_iter().flat_map(|e| e.1.into_vec()).collect();
+        let reverse = self.reverse_edge_resolver.resolve_reverse_edges(uncached_edges.clone()).await
+>>>>>>> internal-286-lens-header-dup
             .map_err(Err)?;
 
         uncached_edges.extend_from_slice(&reverse[..]);
@@ -153,6 +210,7 @@ where
         }
 
         for edge in uncached_edges {
+<<<<<<< HEAD
             uncached_subgraph.add_edge(edge.edge_name, edge.from_node_key, edge.to_node_key);
         }
 
@@ -162,12 +220,27 @@ where
                 &uncached_subgraph,
                 &mut merged_graph,
             )
+=======
+            uncached_subgraph.add_edge(
+                edge.edge_name,
+                edge.from_node_key,
+                edge.to_node_key,
+            );
+        }
+
+        upserter::GraphMergeHelper{}
+            .upsert_into(self.mg_client.clone(), &uncached_subgraph, &mut merged_graph)
+>>>>>>> internal-286-lens-header-dup
             .await;
 
         Ok(merged_graph)
     }
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> internal-286-lens-header-dup
 pub fn time_based_key_fn(_event: &[u8]) -> String {
     let cur_ms = match SystemTime::now().duration_since(UNIX_EPOCH) {
         Ok(n) => n.as_millis(),

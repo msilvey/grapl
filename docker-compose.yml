@@ -83,10 +83,45 @@ services:
         aliases:
           - ${REDIS_HOST}
 
+<<<<<<< HEAD
   # While localstack does offer S3 capabilities, it's not actually
   # MinIO, which is a very full-featured and faithful S3 clone. We
   # have noticed test failures when we use localstack's s3, so we will
   # continue to use MinIO.
+=======
+  sqs:
+    image: localstack/localstack:0.11.5
+    environment:
+      - HOSTNAME_EXTERNAL=${SQS_HOST}
+      - IMAGE_NAME=localstack/localstack:0.11.5
+      - SERVICES=sqs:${SQS_PORT}
+    ports:
+      # Used to insert data in local grapl via upload-*.py
+      - 127.0.0.1:${SQS_PORT}:${SQS_PORT}
+    networks:
+      default:
+        aliases:
+          - ${SQS_HOST}
+    logging:
+      driver: none
+
+  secretsmanager:
+    image: localstack/localstack:0.11.5
+    environment:
+      - HOSTNAME_EXTERNAL=${SECRETSMANAGER_HOST}
+      - IMAGE_NAME=localstack/localstack:0.11.5
+      - PORT_WEB_UI=${SECRETSMANAGER_WEB_UI_PORT}
+      - SERVICES=secretsmanager:${SECRETSMANAGER_PORT}
+    ports:
+      - 127.0.0.1:${SECRETSMANAGER_WEB_UI_PORT}:${SECRETSMANAGER_WEB_UI_PORT}
+    networks:
+      default:
+        aliases:
+          - ${SECRETSMANAGER_HOST}
+    logging:
+      driver: none
+
+>>>>>>> internal-286-lens-header-dup
   s3:
     image: minio/minio
     command: server /data

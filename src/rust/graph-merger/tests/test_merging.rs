@@ -1,5 +1,6 @@
 #[cfg(feature = "integration")]
 pub mod test {
+<<<<<<< HEAD
     use std::{collections::HashMap,
               sync::{Arc,
                      Once}};
@@ -22,11 +23,35 @@ pub mod test {
                        Query};
     use graph_merger_lib::upserter::GraphMergeHelper;
     use grapl_graph_descriptions::*;
+=======
+    use dgraph_tonic::Client as DgraphClient;
+    use graph_merger_lib::*;
+    use dgraph_query_lib::schema::{
+        Indexing, PredicateDefinition, PredicateType, Schema, SchemaDefinition,
+    };
+    use dgraph_query_lib::EdgeBuilder;
+    use dgraph_query_lib::ToQueryString;
+    use dgraph_tonic::Query;
+    use std::sync::{Once, Arc};
+    use dgraph_query_lib::queryblock::QueryBlockType;
+    use dgraph_query_lib::condition::{Condition, ConditionValue};
+    use dgraph_query_lib::predicate::{Predicate, Field};
+    use std::collections::HashMap;
+    use dgraph_query_lib::QueryBuilder;
+    use dgraph_query_lib::QueryBlockBuilder;
+    use grapl_graph_descriptions::*;
+    use graph_merger_lib::upserter::GraphMergeHelper;
+>>>>>>> internal-286-lens-header-dup
 
     async fn query_for_uid(dgraph_client: Arc<DgraphClient>, node_key: &str) -> u64 {
         let query_block = QueryBlockBuilder::default()
             .query_type(QueryBlockType::query())
+<<<<<<< HEAD
             .root_filter(Condition::EQ(
+=======
+            .root_filter(Condition
+            ::EQ(
+>>>>>>> internal-286-lens-header-dup
                 format!("node_key"),
                 ConditionValue::string(node_key),
             ))
@@ -59,6 +84,10 @@ pub mod test {
     async fn query_for_edge(
         dgraph_client: Arc<DgraphClient>,
         from_uid: u64,
+<<<<<<< HEAD
+=======
+        to_uid: u64,
+>>>>>>> internal-286-lens-header-dup
         edge_name: &str,
     ) -> serde_json::Value {
         let edge = Predicate::Edge(
@@ -95,6 +124,10 @@ pub mod test {
     }
 
     fn init_test_env() {
+<<<<<<< HEAD
+=======
+
+>>>>>>> internal-286-lens-header-dup
         let subscriber = ::tracing_subscriber::FmtSubscriber::builder()
             .with_env_filter(::tracing_subscriber::EnvFilter::from_default_env())
             .finish();
@@ -118,6 +151,7 @@ pub mod test {
                             PredicateDefinition::new("example_name", PredicateType::String)
                                 .add_index(Indexing::TRIGRAM),
                         )
+<<<<<<< HEAD
                         .add_predicate(PredicateDefinition::new(
                             "to_many_edge",
                             PredicateType::UIDArray,
@@ -126,15 +160,29 @@ pub mod test {
                             "to_single_edge",
                             PredicateType::UID,
                         )),
+=======
+                        .add_predicate(
+                            PredicateDefinition::new("to_many_edge", PredicateType::UIDArray)
+                        )
+                        .add_predicate(
+                            PredicateDefinition::new("to_single_edge", PredicateType::UID)
+                        ),
+>>>>>>> internal-286-lens-header-dup
                 )
                 .to_string();
 
             std::thread::spawn(move || {
+<<<<<<< HEAD
                 let rt = tokio::runtime::Runtime::new().expect("failed to init runtime");
+=======
+                let mut rt  = tokio::runtime::Runtime::new()
+                    .expect("failed to init runtime");
+>>>>>>> internal-286-lens-header-dup
                 rt.block_on(async {
                     let dgraph_client = DgraphClient::new("http://127.0.0.1:9080")
                         .expect("Failed to create dgraph client.");
 
+<<<<<<< HEAD
                     dgraph_client
                         .alter(dgraph_tonic::Operation {
                             drop_all: true,
@@ -158,6 +206,23 @@ pub mod test {
     }
 
     #[tokio::test(flavor = "multi_thread")]
+=======
+                    dgraph_client.alter(dgraph_tonic::Operation {
+                        drop_all: true,
+                        ..Default::default()
+                    }).await.expect("alter failed");
+
+                    dgraph_client.alter(dgraph_tonic::Operation {
+                        schema,
+                        ..Default::default()
+                    }).await.expect("alter failed");
+                });
+            }).join().expect("provision failed");
+        });
+    }
+
+    #[tokio::test(threaded_scheduler)]
+>>>>>>> internal-286-lens-header-dup
     async fn test_upsert_edge_and_retrieve() -> Result<(), Box<dyn std::error::Error>> {
         init_test_env();
         let mut identified_graph = IdentifiedGraph::new();
@@ -168,10 +233,14 @@ pub mod test {
         let mut properties = HashMap::new();
         properties.insert(
             "example_name".to_string(),
+<<<<<<< HEAD
             ImmutableStrProp {
                 prop: "foobar".to_string(),
             }
             .into(),
+=======
+            ImmutableStrProp{prop: "foobar".to_string()}.into(),
+>>>>>>> internal-286-lens-header-dup
         );
         let n0 = IdentifiedNode {
             node_key: "example-node-key".to_string(),
@@ -182,10 +251,14 @@ pub mod test {
         let mut properties = HashMap::new();
         properties.insert(
             "example_name".to_string(),
+<<<<<<< HEAD
             ImmutableStrProp {
                 prop: "baz".to_string(),
             }
             .into(),
+=======
+            ImmutableStrProp{prop: "baz".to_string()}.into(),
+>>>>>>> internal-286-lens-header-dup
         );
 
         let n1 = IdentifiedNode {
@@ -209,7 +282,12 @@ pub mod test {
             "example-node-key".to_string(),
         );
 
+<<<<<<< HEAD
         GraphMergeHelper {}
+=======
+
+        GraphMergeHelper{}
+>>>>>>> internal-286-lens-header-dup
             .upsert_into(dgraph_client.clone(), &identified_graph, &mut merged_graph)
             .await;
 
@@ -219,10 +297,18 @@ pub mod test {
         assert_ne!(node_uid_0, 0);
         assert_ne!(node_uid_1, 0);
 
+<<<<<<< HEAD
         let to_many_res = query_for_edge(dgraph_client.clone(), node_uid_0, "to_many_edge").await;
 
         let to_single_res =
             query_for_edge(dgraph_client.clone(), node_uid_1, "to_single_edge").await;
+=======
+        let to_many_res =
+            query_for_edge(dgraph_client.clone(), node_uid_0, node_uid_1, "to_many_edge").await;
+
+        let to_single_res =
+            query_for_edge(dgraph_client.clone(), node_uid_1, node_uid_0, "to_single_edge").await;
+>>>>>>> internal-286-lens-header-dup
 
         let to_many_res = to_many_res
             .as_object()
@@ -238,6 +324,7 @@ pub mod test {
             .expect("to_single_res empty array");
 
         let tm_from = to_many_res[0]["uid"].as_str().expect("tm_from");
+<<<<<<< HEAD
         let tm_to = to_many_res[0]["to_many_edge"][0]["uid"]
             .as_str()
             .expect("tm_to");
@@ -246,13 +333,24 @@ pub mod test {
         let ts_to = to_single_res[0]["to_single_edge"]["uid"]
             .as_str()
             .expect("ts_to");
+=======
+        let tm_to = to_many_res[0]["to_many_edge"][0]["uid"].as_str().expect("tm_to");
+
+        let ts_from = to_single_res[0]["uid"].as_str().expect("ts_from");
+        let ts_to = to_single_res[0]["to_single_edge"]["uid"].as_str().expect("ts_to");
+>>>>>>> internal-286-lens-header-dup
 
         assert_eq!(tm_from, ts_to);
         assert_eq!(tm_to, ts_from);
         Ok(())
     }
 
+<<<<<<< HEAD
     #[tokio::test(flavor = "multi_thread")]
+=======
+
+    #[tokio::test(threaded_scheduler)]
+>>>>>>> internal-286-lens-header-dup
     async fn test_upsert_idempotency() -> Result<(), Box<dyn std::error::Error>> {
         init_test_env();
 
@@ -264,10 +362,14 @@ pub mod test {
         let mut properties = HashMap::new();
         properties.insert(
             "example_name".to_string(),
+<<<<<<< HEAD
             ImmutableStrProp {
                 prop: "foobar".to_string(),
             }
             .into(),
+=======
+            ImmutableStrProp{prop: "foobar".to_string()}.into(),
+>>>>>>> internal-286-lens-header-dup
         );
         let n0 = IdentifiedNode {
             node_key: node_key.to_string(),
@@ -275,6 +377,7 @@ pub mod test {
             properties,
         };
 
+<<<<<<< HEAD
         let upsert_futs: Vec<_> = (0..10)
             .map(|_| {
                 let dgraph_client = dgraph_client.clone();
@@ -291,6 +394,22 @@ pub mod test {
                 }
             })
             .collect();
+=======
+        let upsert_futs: Vec<_> = (0..10).map(|_| {
+            let dgraph_client = dgraph_client.clone();
+            let n0 = n0.clone();
+            async move {
+                let mut identified_graph = IdentifiedGraph::new();
+                identified_graph.add_node(n0);
+                let mut merged_graph = MergedGraph::new();
+
+                GraphMergeHelper{}
+                    .upsert_into(dgraph_client.clone(), &identified_graph, &mut merged_graph)
+                    .await;
+                merged_graph
+            }
+        }).collect();
+>>>>>>> internal-286-lens-header-dup
 
         let mut merged_graphs = Vec::with_capacity(upsert_futs.len());
         for upsert_fut in upsert_futs.into_iter() {
@@ -331,7 +450,12 @@ pub mod test {
         Ok(())
     }
 
+<<<<<<< HEAD
     #[tokio::test(flavor = "multi_thread")]
+=======
+
+    #[tokio::test(threaded_scheduler)]
+>>>>>>> internal-286-lens-header-dup
     async fn test_upsert_multifield() -> Result<(), Box<dyn std::error::Error>> {
         init_test_env();
 
@@ -343,10 +467,14 @@ pub mod test {
         let mut properties = HashMap::new();
         properties.insert(
             "example_name".to_string(),
+<<<<<<< HEAD
             ImmutableStrProp {
                 prop: "test_upsert_multifield".to_string(),
             }
             .into(),
+=======
+            ImmutableStrProp{prop: "test_upsert_multifield".to_string()}.into(),
+>>>>>>> internal-286-lens-header-dup
         );
         let n0 = IdentifiedNode {
             node_key: node_key.to_string(),
@@ -357,7 +485,11 @@ pub mod test {
         identified_graph.add_node(n0);
         let mut merged_graph = MergedGraph::new();
 
+<<<<<<< HEAD
         GraphMergeHelper {}
+=======
+        GraphMergeHelper{}
+>>>>>>> internal-286-lens-header-dup
             .upsert_into(dgraph_client.clone(), &identified_graph, &mut merged_graph)
             .await;
 
@@ -368,10 +500,14 @@ pub mod test {
                 format!("node_key"),
                 ConditionValue::string(node_key),
             ))
+<<<<<<< HEAD
             .predicates(vec![
                 Predicate::Field(Field::new("uid")),
                 Predicate::Field(Field::new("example_name")),
             ])
+=======
+            .predicates(vec![Predicate::Field(Field::new("uid")), Predicate::Field(Field::new("example_name"))])
+>>>>>>> internal-286-lens-header-dup
             // .first(2)
             .build()
             .unwrap();
@@ -392,10 +528,18 @@ pub mod test {
         let mut m = m.into_iter().next().unwrap().1;
         debug_assert_eq!(m.len(), 1);
         let mut m = m.remove(0);
+<<<<<<< HEAD
         let _uid = m.remove("uid").expect("uid");
+=======
+        let uid = m.remove("uid").expect("uid");
+>>>>>>> internal-286-lens-header-dup
         let example_name = m.remove("example_name").expect("example_name");
         assert!(m.is_empty());
         assert_eq!(example_name, "test_upsert_multifield");
         Ok(())
+<<<<<<< HEAD
+=======
+
+>>>>>>> internal-286-lens-header-dup
     }
 }

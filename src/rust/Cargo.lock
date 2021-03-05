@@ -87,6 +87,15 @@ checksum = "afddf7f520a80dbf76e6f50a35bca42a2331ef227a28b3b6dc5c2e2338d114b1"
 [[package]]
 name = "arbitrary"
 version = "1.0.0"
+<<<<<<< HEAD
+=======
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "698b65a961a9d730fb45b6b0327e20207810c9f61ee421b082b27ba003f49e2b"
+
+[[package]]
+name = "arrayref"
+version = "0.3.6"
+>>>>>>> internal-286-lens-header-dup
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "698b65a961a9d730fb45b6b0327e20207810c9f61ee421b082b27ba003f49e2b"
 
@@ -636,6 +645,26 @@ dependencies = [
 ]
 
 [[package]]
+<<<<<<< HEAD
+=======
+name = "dgraph-rs"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4acc07a324481d5ef51bc651098fd2964f5eb278b7ddca920ad1ec574a6c05b1"
+dependencies = [
+ "failure",
+ "futures 0.1.31",
+ "futures-cpupool",
+ "grpc",
+ "httpbis",
+ "protobuf",
+ "protoc-rust-grpc",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+>>>>>>> internal-286-lens-header-dup
 name = "dgraph-tonic"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -921,7 +950,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fde5a672a61f96552aa5ed9fd9c81c3fbdae4be9b1e205d6eaf17c83705adc0f"
 dependencies = [
  "futures 0.3.13",
+<<<<<<< HEAD
  "pin-project-lite 0.2.6",
+ "tokio 1.2.0",
+=======
+ "pin-project 0.4.27",
+ "tokio 0.2.25",
+>>>>>>> internal-286-lens-header-dup
+]
+
+[[package]]
+name = "futures-retry"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fde5a672a61f96552aa5ed9fd9c81c3fbdae4be9b1e205d6eaf17c83705adc0f"
+dependencies = [
+ "futures 0.3.13",
+ "pin-project-lite 0.2.4",
  "tokio 1.2.0",
 ]
 
@@ -975,7 +1020,11 @@ dependencies = [
  "async-trait",
  "aws_lambda_events 0.2.7",
  "endpoint-plugin",
+<<<<<<< HEAD
  "eyre",
+=======
+ "eyre 0.4.3",
+>>>>>>> internal-286-lens-header-dup
  "futures 0.3.13",
  "grapl-config",
  "grapl-graph-descriptions",
@@ -1067,14 +1116,22 @@ dependencies = [
  "dgraph_query_lib",
  "failure",
  "futures 0.3.13",
+<<<<<<< HEAD
  "futures-retry",
+=======
+ "futures-retry 0.6.0",
+>>>>>>> internal-286-lens-header-dup
  "grapl-config",
  "grapl-graph-descriptions",
  "grapl-observe",
  "grapl-service",
  "grapl-utils",
  "lazy_static",
+<<<<<<< HEAD
  "log",
+=======
+ "log 0.4.14",
+>>>>>>> internal-286-lens-header-dup
  "lru",
  "prost 0.7.0",
  "rand 0.8.3",
@@ -1136,19 +1193,43 @@ dependencies = [
 name = "grapl-graph-descriptions"
 version = "0.2.10"
 dependencies = [
+<<<<<<< HEAD
  "arbitrary",
  "derive_builder",
  "log",
+=======
+ "anyhow",
+ "arbitrary",
+ "derive_builder",
+ "dgraph-tonic",
+ "dgraph_query_lib",
+ "futures 0.3.13",
+ "futures-retry 0.5.0",
+ "grapl-utils",
+ "hex",
+ "log 0.4.14",
+>>>>>>> internal-286-lens-header-dup
  "prost 0.7.0",
  "prost-build",
  "prost-derive 0.7.0",
+<<<<<<< HEAD
  "prost-types",
+=======
+ "prost-types 0.7.0",
+>>>>>>> internal-286-lens-header-dup
  "quickcheck",
  "quickcheck_macros",
  "rand 0.8.3",
  "serde",
  "serde_derive",
+<<<<<<< HEAD
  "test-env-log",
+=======
+ "serde_json",
+ "test-env-log",
+ "thiserror",
+ "tokio 0.2.25",
+>>>>>>> internal-286-lens-header-dup
  "tracing",
  "tracing-subscriber",
  "uuid 0.8.2",
@@ -1190,7 +1271,41 @@ dependencies = [
  "async-trait",
  "rusoto_core",
  "rusoto_dynamodb",
+<<<<<<< HEAD
  "tokio 1.2.0",
+=======
+ "tokio 0.2.25",
+]
+
+[[package]]
+name = "grpc"
+version = "0.6.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2aaf1d741fe6f3413f1f9f71b99f5e4e26776d563475a8a53ce53a73a8534c1d"
+dependencies = [
+ "base64 0.9.3",
+ "bytes 0.4.12",
+ "futures 0.1.31",
+ "futures-cpupool",
+ "httpbis",
+ "log 0.4.14",
+ "protobuf",
+ "tls-api",
+ "tls-api-stub",
+ "tokio-core",
+ "tokio-io",
+ "tokio-tls-api",
+]
+
+[[package]]
+name = "grpc-compiler"
+version = "0.6.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "907274ce8ee7b40a0d0b0db09022ea22846a47cfb1fc8ad2c983c70001b4ffb1"
+dependencies = [
+ "protobuf",
+ "protobuf-codegen",
+>>>>>>> internal-286-lens-header-dup
 ]
 
 [[package]]
@@ -1340,6 +1455,31 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "615caabe2c3160b313d52ccc905335f4ed5f10881dd63dc5699d47e90be85691"
 
 [[package]]
+<<<<<<< HEAD
+=======
+name = "httpbis"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7689cfa896b2a71da4f16206af167542b75d242b6906313e53857972a92d5614"
+dependencies = [
+ "bytes 0.4.12",
+ "futures 0.1.31",
+ "futures-cpupool",
+ "log 0.4.14",
+ "net2",
+ "tls-api",
+ "tls-api-stub",
+ "tokio-core",
+ "tokio-io",
+ "tokio-timer 0.1.2",
+ "tokio-tls-api",
+ "tokio-uds 0.1.7",
+ "unix_socket",
+ "void",
+]
+
+[[package]]
+>>>>>>> internal-286-lens-header-dup
 name = "httpdate"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1947,9 +2087,15 @@ checksum = "a9a7ab5d64814df0fe4a4b5ead45ed6c5f181ee3ff04ba344313a6c80446c5d4"
 
 [[package]]
 name = "once_cell"
+<<<<<<< HEAD
 version = "1.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "af8b08b04175473088b46763e51ee54da5f9a164bc162f615b91bc179dbf15a3"
+=======
+version = "1.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "10acf907b94fc1b1a152d08ef97e7759650268cf986bf127f387e602b02c7e5a"
+>>>>>>> internal-286-lens-header-dup
 
 [[package]]
 name = "opaque-debug"
@@ -2031,6 +2177,23 @@ dependencies = [
 ]
 
 [[package]]
+<<<<<<< HEAD
+=======
+name = "parking_lot_core"
+version = "0.8.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fa7a782938e745763fe6907fc6ba86946d72f49fe7e21de074e08128a99fb018"
+dependencies = [
+ "cfg-if 1.0.0",
+ "instant",
+ "libc",
+ "redox_syscall 0.2.5",
+ "smallvec 1.6.1",
+ "winapi 0.3.9",
+]
+
+[[package]]
+>>>>>>> internal-286-lens-header-dup
 name = "percent-encoding"
 version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2564,7 +2727,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "17dc69132670b25e3cc2f5cdb3a56605615c19f563be3d6ee5e359ccfa400fa8"
 dependencies = [
  "async-trait",
+<<<<<<< HEAD
  "bytes 1.0.1",
+=======
+ "bytes 0.5.6",
+>>>>>>> internal-286-lens-header-dup
  "futures 0.3.13",
  "rusoto_core",
  "serde_urlencoded",
@@ -2604,9 +2771,17 @@ checksum = "8e91e4c25ea8bfa6247684ff635299015845113baaa93ba8169b9e565701b58e"
 dependencies = [
  "async-trait",
  "chrono",
+<<<<<<< HEAD
  "dirs-next",
  "futures 0.3.13",
  "hyper 0.14.4",
+=======
+ "dirs",
+ "futures 0.3.13",
+ "hyper 0.13.10",
+ "pin-project 0.4.27",
+ "regex",
+>>>>>>> internal-286-lens-header-dup
  "serde",
  "serde_json",
  "shlex",
@@ -2621,7 +2796,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0f26af40f36409cb8fae3069690f78f638f747b55c7b90f338d5ed36016b0cda"
 dependencies = [
  "async-trait",
+<<<<<<< HEAD
  "bytes 1.0.1",
+=======
+ "bytes 0.5.6",
+>>>>>>> internal-286-lens-header-dup
  "futures 0.3.13",
  "rusoto_core",
  "serde",
@@ -2635,7 +2814,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "abc3f56f14ccf91f880b9a9c2d0556d8523e8c155041c54db155b384a1dd1119"
 dependencies = [
  "async-trait",
+<<<<<<< HEAD
  "bytes 1.0.1",
+=======
+ "bytes 0.5.6",
+>>>>>>> internal-286-lens-header-dup
  "futures 0.3.13",
  "rusoto_core",
  "xml-rs",
@@ -2647,8 +2830,13 @@ version = "0.46.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5486e6b1673ab3e0ba1ded284fb444845fe1b7f41d13989a54dd60f62a7b2baa"
 dependencies = [
+<<<<<<< HEAD
  "base64 0.13.0",
  "bytes 1.0.1",
+=======
+ "base64 0.12.3",
+ "bytes 0.5.6",
+>>>>>>> internal-286-lens-header-dup
  "futures 0.3.13",
  "hex",
  "hmac",
@@ -2668,12 +2856,15 @@ dependencies = [
 
 [[package]]
 name = "rusoto_sqs"
+<<<<<<< HEAD
 version = "0.46.0"
+=======
+version = "0.45.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "054901b35dd1ed5f7be0e490a9d3476dc0b236ca8383fe600d3fe851e0a32e67"
+checksum = "fcd228a1b4ce3f3a40541ee8cef526ff3702b58a4779fb05c31e739174efda5e"
 dependencies = [
  "async-trait",
- "bytes 1.0.1",
+ "bytes 0.5.6",
  "futures 0.3.13",
  "rusoto_core",
  "serde_urlencoded",
@@ -2681,6 +2872,41 @@ dependencies = [
 ]
 
 [[package]]
+name = "rusoto_sts"
+version = "0.45.0"
+>>>>>>> internal-286-lens-header-dup
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "054901b35dd1ed5f7be0e490a9d3476dc0b236ca8383fe600d3fe851e0a32e67"
+dependencies = [
+ "async-trait",
+<<<<<<< HEAD
+ "bytes 1.0.1",
+=======
+ "bytes 0.5.6",
+ "chrono",
+>>>>>>> internal-286-lens-header-dup
+ "futures 0.3.13",
+ "rusoto_core",
+ "serde_urlencoded",
+ "xml-rs",
+]
+
+[[package]]
+<<<<<<< HEAD
+=======
+name = "rust-argon2"
+version = "0.8.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4b18820d944b33caa75a71378964ac46f58517c92b6ae5f762636247c09e78fb"
+dependencies = [
+ "base64 0.13.0",
+ "blake2b_simd",
+ "constant_time_eq",
+ "crossbeam-utils 0.8.3",
+]
+
+[[package]]
+>>>>>>> internal-286-lens-header-dup
 name = "rustc-demangle"
 version = "0.1.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2847,9 +3073,15 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
+<<<<<<< HEAD
 version = "1.0.64"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "799e97dc9fdae36a5c8b8f2cae9ce2ee9fdce2058c57a93e6099d919fd982f79"
+=======
+version = "1.0.63"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "43535db9747a4ba938c0ce0a98cc631a46ebf943c9e1d604e091df6007620bf6"
+>>>>>>> internal-286-lens-header-dup
 dependencies = [
  "itoa",
  "ryu",
@@ -2957,6 +3189,10 @@ dependencies = [
  "aws_lambda_events 0.3.1",
  "chrono",
  "darkredis",
+<<<<<<< HEAD
+=======
+ "eyre 0.6.5",
+>>>>>>> internal-286-lens-header-dup
  "futures 0.3.13",
  "futures-util",
  "grapl-observe",
@@ -3335,7 +3571,11 @@ checksum = "5a09c0b5bb588872ab2f09afa13ee6e9dac11e10a0ec9e8e3ba39a5a5d530af6"
 dependencies = [
  "bytes 0.4.12",
  "futures 0.1.31",
+<<<<<<< HEAD
  "mio 0.6.23",
+=======
+ "mio",
+>>>>>>> internal-286-lens-header-dup
  "num_cpus",
  "tokio-codec",
  "tokio-current-thread",
@@ -3387,6 +3627,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "tokio"
+version = "1.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e8190d04c665ea9e6b6a0dc45523ade572c088d2e6566244c1122671dbf4ae3a"
+dependencies = [
+ "autocfg 1.0.1",
+ "pin-project-lite 0.2.4",
+]
+
+[[package]]
 name = "tokio-buf"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3431,12 +3681,26 @@ version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e7d4237822b7be8fff0a7a27927462fad435dcb6650f95cea9e946bf6bdc7e07"
 dependencies = [
+<<<<<<< HEAD
  "bytes 0.5.6",
  "once_cell",
  "pin-project-lite 0.2.6",
  "tokio 0.2.25",
  "tokio 1.2.0",
  "tokio-stream",
+=======
+ "bytes 0.4.12",
+ "futures 0.1.31",
+ "iovec",
+ "log 0.4.14",
+ "mio",
+ "scoped-tls",
+ "tokio 0.1.22",
+ "tokio-executor",
+ "tokio-io",
+ "tokio-reactor",
+ "tokio-timer 0.2.13",
+>>>>>>> internal-286-lens-header-dup
 ]
 
 [[package]]
@@ -3478,7 +3742,11 @@ checksum = "57fc868aae093479e3131e3d165c93b1c7474109d13c90ec0dda2a1bbfff0674"
 dependencies = [
  "bytes 0.4.12",
  "futures 0.1.31",
+<<<<<<< HEAD
  "log",
+=======
+ "log 0.4.14",
+>>>>>>> internal-286-lens-header-dup
 ]
 
 [[package]]
@@ -3576,17 +3844,48 @@ dependencies = [
 
 [[package]]
 name = "tokio-timer"
+<<<<<<< HEAD
+=======
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6131e780037787ff1b3f8aad9da83bca02438b72277850dd6ad0d455e0e20efc"
+dependencies = [
+ "futures 0.1.31",
+ "slab 0.3.0",
+]
+
+[[package]]
+name = "tokio-timer"
+>>>>>>> internal-286-lens-header-dup
 version = "0.2.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "93044f2d313c95ff1cb7809ce9a7a05735b012288a888b62d4434fd58c94f296"
 dependencies = [
  "crossbeam-utils 0.7.2",
  "futures 0.1.31",
+<<<<<<< HEAD
  "slab",
+=======
+ "slab 0.4.2",
+>>>>>>> internal-286-lens-header-dup
  "tokio-executor",
 ]
 
 [[package]]
+<<<<<<< HEAD
+=======
+name = "tokio-tls-api"
+version = "0.1.22"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "68d0e040d5b1f4cfca70ec4f371229886a5de5bb554d272a4a8da73004a7b2c9"
+dependencies = [
+ "futures 0.1.31",
+ "tls-api",
+ "tokio-io",
+]
+
+[[package]]
+>>>>>>> internal-286-lens-header-dup
 name = "tokio-udp"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3594,8 +3893,13 @@ checksum = "e2a0b10e610b39c38b031a2fcab08e4b82f16ece36504988dcbd81dbba650d82"
 dependencies = [
  "bytes 0.4.12",
  "futures 0.1.31",
+<<<<<<< HEAD
  "log",
  "mio 0.6.23",
+=======
+ "log 0.4.14",
+ "mio",
+>>>>>>> internal-286-lens-header-dup
  "tokio-codec",
  "tokio-io",
  "tokio-reactor",
@@ -3603,6 +3907,26 @@ dependencies = [
 
 [[package]]
 name = "tokio-uds"
+<<<<<<< HEAD
+=======
+version = "0.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "65ae5d255ce739e8537221ed2942e0445f4b3b813daebac1c0050ddaaa3587f9"
+dependencies = [
+ "bytes 0.4.12",
+ "futures 0.1.31",
+ "iovec",
+ "libc",
+ "log 0.3.9",
+ "mio",
+ "mio-uds",
+ "tokio-core",
+ "tokio-io",
+]
+
+[[package]]
+name = "tokio-uds"
+>>>>>>> internal-286-lens-header-dup
 version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ab57a4ac4111c8c9dbcf70779f6fc8bc35ae4b2454809febac840ad19bd7e4e0"
@@ -3918,7 +4242,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6395efa4784b027708f7451087e647ec73cc74f5d9bc2e418404248d679a230"
 dependencies = [
  "futures 0.1.31",
+<<<<<<< HEAD
  "log",
+=======
+ "log 0.4.14",
+>>>>>>> internal-286-lens-header-dup
  "try-lock",
 ]
 

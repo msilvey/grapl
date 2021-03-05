@@ -1,6 +1,7 @@
-use derive_dynamic_node::{GraplSessionId,
-                          GraplStaticId,
-                          NodeDescription};
+use derive_dynamic_node::{NodeDescription,
+                          GraplSessionId,
+                          GraplStaticId};
+
 use grapl_graph_descriptions::graph_description::*;
 use log::info;
 use serde_derive::Deserialize;
@@ -20,6 +21,7 @@ pub struct SpecialProcess {
     #[grapl(pseudo_key, immutable)]
     pub process_id: u64,
 }
+
 
 #[derive(Clone, Debug, Deserialize)]
 struct InstanceDetails {
