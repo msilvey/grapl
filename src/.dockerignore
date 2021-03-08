@@ -2,6 +2,8 @@
 **/node_modules
 
 rust/target
+# Why is there a second target directory for this one project?
+rust/analyzer-dispatcher/target
 
 js/grapl-cdk/zips
 js/grapl-cdk/cdk.out
