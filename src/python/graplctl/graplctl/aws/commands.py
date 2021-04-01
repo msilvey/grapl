@@ -119,6 +119,7 @@ def provision(graplctl_state: State):
     )
     click.echo("provisioned grapl deployment")
 
+
 @aws.command()
 @pass_graplctl_state
 def test(graplctl_state: State):
