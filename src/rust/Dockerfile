@@ -1,10 +1,18 @@
 FROM rust:1-slim-buster AS build
 
 ARG CARGO_PROFILE=debug
+ARG DOCKER_IP
 
 SHELL ["/bin/bash", "-c"]
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN rm -f /etc/apt/apt.conf.d/docker-clean; \
+    echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' \
+    > /etc/apt/apt.conf.d/keep-cache
+
+RUN echo 'Acquire::http { Proxy "http://$DOCKER_IP:3142"; };' >> /etc/apt/apt.conf.d/01proxy
+
+RUN --mount=type=cache,target=/var/cache/apt \
+    apt-get update && apt-get install -y --no-install-recommends \
         wait-for-it \
         wget \
         zip \

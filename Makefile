@@ -7,7 +7,8 @@ TAG ?= latest
 CARGO_PROFILE ?= debug
 UID = $(shell id -u)
 GID = $(shell id -g)
-DOCKER_BUILDX_BAKE_OPTS ?=
+export DOCKER_IP = $(docker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}')
+DOCKER_BUILDX_BAKE_OPTS ?= 
 ifneq ($(GRAPL_RUST_ENV_FILE),)
 DOCKER_BUILDX_BAKE_OPTS += --set *.secrets=id=rust_env,src="$(GRAPL_RUST_ENV_FILE)"
 endif
@@ -79,6 +80,11 @@ WITH_LOCAL_GRAPL_ENV := set -o allexport; . ./local-grapl.env; set +o allexport;
 #
 # Build
 #
+
+.PHONY: build-apt-cache
+build-apt-cache:
+	docker build -t build_apt_cache - < ./build-support/Dockerfile.apt_cache_ng && \
+        docker run -p 3142:3142 -d build_apt_cache
 
 .PHONY: build
 build: build-services ## Alias for `services` (default)
