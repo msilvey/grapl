@@ -19,6 +19,7 @@ services:
       target: sysmon-subgraph-generator-deploy
       args:
         - CARGO_PROFILE=${CARGO_PROFILE:-debug}
+        - DOCKER_IP=${DOCKER_IP}
 
   grapl-osquery-subgraph-generator:
     image: grapl/grapl-osquery-subgraph-generator:${TAG:-latest}
@@ -28,6 +29,7 @@ services:
       target: osquery-subgraph-generator-deploy
       args:
         - CARGO_PROFILE=${CARGO_PROFILE:-debug}
+        - DOCKER_IP=${DOCKER_IP}
 
   grapl-node-identifier:
     image: grapl/grapl-node-identifier:${TAG:-latest}
@@ -37,6 +39,7 @@ services:
       target: node-identifier-deploy
       args:
         - CARGO_PROFILE=${CARGO_PROFILE:-debug}
+        - DOCKER_IP=${DOCKER_IP}
 
   grapl-node-identifier-retry-handler:
     image: grapl/grapl-node-identifier-retry-handler:${TAG:-latest}
@@ -46,6 +49,7 @@ services:
       target: node-identifier-retry-handler-deploy
       args:
         - CARGO_PROFILE=${CARGO_PROFILE:-debug}
+        - DOCKER_IP=${DOCKER_IP}
 
   grapl-graph-merger:
     image: grapl/grapl-graph-merger:${TAG:-latest}
@@ -55,6 +59,7 @@ services:
       target: graph-merger-deploy
       args:
         - CARGO_PROFILE=${CARGO_PROFILE:-debug}
+        - DOCKER_IP=${DOCKER_IP}
 
   grapl-analyzer-dispatcher:
     image: grapl/grapl-analyzer-dispatcher:${TAG:-latest}
@@ -64,6 +69,7 @@ services:
       target: analyzer-dispatcher-deploy
       args:
         - CARGO_PROFILE=${CARGO_PROFILE:-debug}
+        - DOCKER_IP=${DOCKER_IP}
 
   ########################################################################
   # Python Services
