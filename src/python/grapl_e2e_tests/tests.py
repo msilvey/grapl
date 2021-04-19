@@ -234,11 +234,7 @@ def delete_model_plugin(
 
     assert deleted
 
-
-# ---------------------------- end model plugin helpers ------------------------------------
-
 # ---------------------------- AUTH HELPERS v ------------------------------------
-
 
 def get_notebook_url() -> None:
     jwt = EngagementEdgeClient().get_jwt()
