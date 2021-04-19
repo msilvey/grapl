@@ -105,3 +105,4 @@ args = [ "--suppress-no-test-exit-code" ]
 version = "mypy==0.800"
 config = "src/python/mypy.ini"
 args = [ "--show-error-codes" ]
+
