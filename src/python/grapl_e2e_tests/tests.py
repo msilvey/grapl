@@ -24,6 +24,10 @@ LENS_NAME = "DESKTOP-FVSHABR"
 GqlLensDict = Dict[str, Any]
 
 
+class TestException(Exception):
+    pass
+
+
 @pytest.mark.integration_test
 class TestEndToEnd(TestCase):
     def test_expected_data_in_dgraph(self) -> None:
@@ -78,6 +82,15 @@ class TestEndToEnd(TestCase):
             model_plugin_client=ModelPluginDeployerClient.from_env(),
             plugin_to_delete="aws_plugin",
         )  # TODO: we need to change the plugin name when this endpoint gets fixed
+
+    def test_check_login(self) -> None:
+        check_login()
+
+    def test_get_notebook_url(self) -> None:
+        get_notebook_url()
+
+    def test_check__invalid_creds(self) -> None:
+        check_invalid_creds()
 
 
 def ensure_graphql_lens_scope_no_errors(
@@ -223,3 +236,35 @@ def delete_model_plugin(
 
 
 # ---------------------------- end model plugin helpers ------------------------------------
+
+# ---------------------------- AUTH HELPERS v ------------------------------------
+
+
+def get_notebook_url() -> None:
+    jwt = EngagementEdgeClient().get_jwt()
+    notebook_url = EngagementEdgeClient().get_notebook(jwt)
+
+    if (
+        "localhost:8888" in notebook_url
+    ):  # TODO: Need to conditionally change for AWS Deployments
+        assert f"Found notebook url on {notebook_url}"
+    else:
+        raise TestException(
+            f"Unable to retrieve notebook url or notebook url is invalid: {notebook_url}"
+        )
+
+
+def check_login() -> None:
+    jwt = EngagementEdgeClient().get_jwt()
+    if jwt != None:
+        assert f"Auth working, jwt exists {jwt}"
+    else:
+        raise TestException(f"Unable to retrieve jwt token - auth is broken")
+
+
+def check_invalid_creds() -> None:
+    resp = EngagementEdgeClient().invalid_creds()
+    if resp.status_code == 403:
+        assert f"Provided invalid creds & was unauthorized"
+    else:
+        raise TestException(f"Unable to retrieve jwt token - auth is broken")
