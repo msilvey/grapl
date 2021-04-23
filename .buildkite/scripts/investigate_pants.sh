@@ -3,7 +3,7 @@
 echo "--- Detecting environment"
 env
 
-make lint-python
+./pants --no-process-execution-local-cleanup lint ::
 
 echo "--- failing thing"
 ls -alh .cache
