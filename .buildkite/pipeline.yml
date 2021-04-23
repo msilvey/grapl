@@ -23,6 +23,13 @@ steps:
   - label: "env"
     command:
       - env
+  - label: "investigating"
+    command:
+      - .buildkite/scripts/investigate_pants.sh
+    plugins:
+      - gencer/cache#v2.4.8:
+          id: pants-lint
+          <<: *pants_cache_config
 
   - label: ":large_blue_square: :lint-roller: Lint Protobuf"
     command:
