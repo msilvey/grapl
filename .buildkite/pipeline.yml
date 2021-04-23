@@ -132,7 +132,7 @@ steps:
     agents:
       queue: "beefy"
     artifact_paths:
-      - "artifacts_*_*/**"
+      - "test_artifacts/**"
 
   - label: ":hammer: E2E Tests"
     command:
@@ -140,4 +140,4 @@ steps:
     agents:
       queue: "beefy"
     artifact_paths:
-      - "artifacts_*_*/**"
+      - "test_artifacts/**"
