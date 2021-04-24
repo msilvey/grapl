@@ -2,6 +2,15 @@
 env:
   PANTS_CONFIG_FILES: "['pants.toml', 'pants.ci.toml']"
 
+# TODO: The cache has to be specific to the agent number to account
+# for the pex venv shebang lines, which incorporate the absolute path
+# of the cache directory. As long as we're using 1 agent per machine,
+# this is not a problem, but as soon as we have more than that, we
+# need to change the cache keys.
+#
+# This also means we're going to have to tweak our environment scripts
+# to expose that agent index as an environment variable.
+
 pants_cache_config: &pants_cache_config
   # Individual jobs must provide an `id` key. We'll first attempt to
   # restore from a cache on the current branch, and fall back to the
@@ -19,17 +28,6 @@ pants_cache_config: &pants_cache_config
 # TODO: possibly just us Docker for caching?
 
 steps:
-
-  - label: "env"
-    command:
-      - env
-  - label: "investigating"
-    command:
-      - .buildkite/scripts/investigate_pants.sh
-    plugins:
-      - gencer/cache#v2.4.8:
-          id: pants-lint
-          <<: *pants_cache_config
 
   - label: ":large_blue_square: :lint-roller: Lint Protobuf"
     command:
