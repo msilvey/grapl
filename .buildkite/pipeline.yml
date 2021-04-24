@@ -10,7 +10,7 @@ pants_cache_config: &pants_cache_config
   restore-keys:
     - "cache-{{ id }}-{{ checksum '3rdparty/python/constraints.txt' }}-main"
   paths:
-    - ".c"
+    - ".cache"
 
 # TODO: Cache for JS, Rust deps
 
